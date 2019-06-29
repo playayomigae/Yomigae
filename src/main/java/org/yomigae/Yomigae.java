@@ -19,7 +19,7 @@ import java.util.logging.SimpleFormatter;
 import processing.core.PApplet;
 
 public class Yomigae extends PApplet {
-	
+
 	static {
     System.setProperty(
         "java.util.logging.SimpleFormatter.format",
@@ -182,7 +182,7 @@ public class Yomigae extends PApplet {
   }
 
   public void onUIReady(LXStudio lx, LXStudio.UI ui) {
-
+    // ui.preview.addComponent(new TempleVisualizer(lx));
   }
 
   public void draw() {
