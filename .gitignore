@@ -14,3 +14,4 @@ node_modules/
 .classpath
 .project
 .settings/
+*.sw[op]
