@@ -133,7 +133,8 @@ public class Yomigae extends PApplet {
       logger.log(Level.SEVERE, "Error creating log file: " + LOG_FILENAME_PREFIX, ex);
     }
 
-    LXModel model = YomigaeModel3D.generateLXModel();
+		YomigaeLayout layout = new YomigaeLayout();
+
     LXStudio.Flags flags = new LXStudio.Flags();
     flags.showFramerate = false;
     flags.isP3LX = true;
@@ -144,7 +145,7 @@ public class Yomigae extends PApplet {
     logger.info("Current graphics is GL:" + getGraphics().isGL());
     logger.info("Multithreaded hint: " + MULTITHREADED);
     logger.info("Multithreaded actually: " + (MULTITHREADED && !getGraphics().isGL()));
-    lx = new LXStudio(this, flags, model);
+    lx = new LXStudio(this, flags, layout.getModel());
 
     lx.ui.setResizable(true);
 
