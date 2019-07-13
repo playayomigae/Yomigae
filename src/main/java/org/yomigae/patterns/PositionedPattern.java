@@ -3,6 +3,7 @@ package org.yomigae.patterns;
 import heronarts.lx.LX;
 import heronarts.lx.LXPattern;
 import heronarts.lx.model.LXPoint;
+import heronarts.lx.parameter.LXParameter;
 import heronarts.lx.parameter.CompoundParameter;
 import heronarts.lx.parameter.EnumParameter;
 
@@ -19,18 +20,22 @@ public abstract class PositionedPattern extends LXPattern {
   public final CompoundParameter pos = new CompoundParameter("Pos", 0.5, -1, 2)
     .setDescription("Position of the center of the pattern");
 
-  public final CompoundParameter width = new CompoundParameter("Width", .4, 0, 1)
-    .setDescription("Thickness of the pattern");
+  public final CompoundParameter colorWidth = new CompoundParameter("colorWidth", .4, 0, 1)
+    .setDescription("Thickness of the color spread");
+
+  public final CompoundParameter alphaWidth = new CompoundParameter("alphaWidth", .4, 0, 1)
+    .setDescription("Thickness of the alpha spread");
 
   public PositionedPattern(LX lx) {
     super(lx);
     addParameter("axis", this.axis);
     addParameter("pos", this.pos);
-    addParameter("width", this.width);
+    addParameter("colorWidth", this.colorWidth);
+    addParameter("alphaWidth", this.alphaWidth);
   }
 
-  protected float getFalloff() {
-    return 100 / this.width.getValuef();
+  protected float getFalloff(LXParameter param) {
+    return 100 / param.getValuef();
   }
 
   protected float getNFromPoint(LXPoint p) {
