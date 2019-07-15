@@ -23,24 +23,24 @@ public class MoonTemperaturePattern extends PositionedPattern {
   }
 
   public void run(double deltaMs) {
-    float pos = this.pos.getValuef();
-    float falloff = getFalloff();
-    float n = 0;
+    // float pos = this.pos.getValuef();
+    // float falloff = getFalloff();
+    // float n = 0;
 
-    float minTemp = this.minTemp.getValuef();
-    float maxTemp = this.maxTemp.getValuef();
+    // float minTemp = this.minTemp.getValuef();
+    // float maxTemp = this.maxTemp.getValuef();
 
-    float value = 0;
-    float valueK = 0;
-    int[] rgb = new int[3];
+    // float value = 0;
+    // float valueK = 0;
+    // int[] rgb = new int[3];
 
-    for (LXPoint p : model.points) {
-      n = getNFromPoint(p);
-      value = Math.max(0, 100 - falloff * Math.abs(n - pos));
-      valueK = MathUtils.map(value, 0, 100, minTemp, maxTemp);
-      ColorTemp.convertKToRGB(valueK, rgb);
+    // for (LXPoint p : model.points) {
+    //   n = getNFromPoint(p);
+    //   value = Math.max(0, 100 - falloff * Math.abs(n - pos));
+    //   valueK = MathUtils.map(value, 0, 100, minTemp, maxTemp);
+    //   ColorTemp.convertKToRGB(valueK, rgb);
 
-      colors[p.index] = LXColor.rgb(rgb[0], rgb[1], rgb[2]);
-    }
+    //   colors[p.index] = LXColor.rgb(rgb[0], rgb[1], rgb[2]);
+    // }
   }
 }
