@@ -9,7 +9,7 @@ target/
 *.tmp
 
 node_modules/
-
+.vscode/
 .metadata
 .classpath
 .project
