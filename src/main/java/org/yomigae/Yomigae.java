@@ -3,6 +3,7 @@ package org.yomigae;
 import com.google.common.reflect.ClassPath;
 import heronarts.lx.LXEffect;
 import heronarts.lx.LXPattern;
+import heronarts.lx.blend.LightestBlend;
 import heronarts.lx.model.LXModel;
 import heronarts.lx.studio.LXStudio;
 
@@ -180,6 +181,7 @@ public class Yomigae extends PApplet {
 
     // Register any patterns and effects LX doesn't recognize
     registerAll(lx);
+    lx.registerBlend(LightestBlend.class);
   }
 
   public void onUIReady(LXStudio lx, LXStudio.UI ui) {
