@@ -62,10 +62,10 @@ public class YomigaeLayout {
 		List<int[]> universeIndices = new ArrayList<>();
 
 		// currently assumes points were created in the correct order
-		universePoints.add(model.filterPoints(ImmutableSet.of(TempleModel.FilterFlags.TWELVE, TempleModel.FilterFlags.THREE)));
-		universePoints.add(model.filterPoints(ImmutableSet.of(TempleModel.FilterFlags.TWELVE, TempleModel.FilterFlags.NINE)));
-		universePoints.add(model.filterPoints(ImmutableSet.of(TempleModel.FilterFlags.SIX, TempleModel.FilterFlags.THREE)));
-		universePoints.add(model.filterPoints(ImmutableSet.of(TempleModel.FilterFlags.SIX, TempleModel.FilterFlags.NINE)));
+		universePoints.add(model.filterClusterPoints(ImmutableSet.of(TempleModel.FilterFlags.TWELVE, TempleModel.FilterFlags.THREE, TempleModel.FilterFlags.TUNNEL, TempleModel.FilterFlags.HALL)));
+		universePoints.add(model.filterClusterPoints(ImmutableSet.of(TempleModel.FilterFlags.TWELVE, TempleModel.FilterFlags.NINE, TempleModel.FilterFlags.TUNNEL, TempleModel.FilterFlags.HALL)));
+		universePoints.add(model.filterClusterPoints(ImmutableSet.of(TempleModel.FilterFlags.SIX, TempleModel.FilterFlags.THREE, TempleModel.FilterFlags.TUNNEL, TempleModel.FilterFlags.HALL)));
+		universePoints.add(model.filterClusterPoints(ImmutableSet.of(TempleModel.FilterFlags.SIX, TempleModel.FilterFlags.NINE, TempleModel.FilterFlags.TUNNEL, TempleModel.FilterFlags.HALL)));
 
 		for (int i = 0; i < universePoints.size(); ++i) {
 			List<LXPoint> points = new ArrayList<>(universePoints.get(i));
@@ -101,7 +101,9 @@ public class YomigaeLayout {
 			int universeLowByte = i + 1;
 
 			try {
-				d.setAddress(SACN_ADDRESS_BASE + universeHighByte + "." + universeLowByte);
+				String address = SACN_ADDRESS_BASE + universeHighByte + "." + universeLowByte;
+				System.out.println("Adding DMX datagram for address " + address);
+				d.setAddress(address);
 			}
 			catch (Exception e) {
 				System.err.println("Error when setting DMX IP address: " + e.getMessage());

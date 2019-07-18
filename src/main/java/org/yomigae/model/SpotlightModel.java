@@ -31,7 +31,7 @@ public class SpotlightModel extends LXModel {
 	}
 
 	public SpotlightModel(LXTransform t, LXTransform r, List<String> extraKeys) {
-		super(buildPoints(t, r));
+		super(buildSubmodels(t, r));
 
 		String[] keys = new String[extraKeys.size() + 1];
 		keys[0] = MODEL_KEY;
@@ -43,10 +43,12 @@ public class SpotlightModel extends LXModel {
 		setKeys(keys);
 	}
 
-	private static List<LXPoint> buildPoints(LXTransform t, LXTransform r) {
-		List<LXPoint> points = new ArrayList<>();
+	private static LXModel[] buildSubmodels(LXTransform t, LXTransform r) {
+		List<LXModel> submodels = new ArrayList<>();
 
 		t.push();
+
+		List<LXPoint> points = new ArrayList<>();
 
 		points.add(new DirectionalPoint(
 				t.x(), t.y(), t.z(),
@@ -54,8 +56,10 @@ public class SpotlightModel extends LXModel {
 				Math.toRadians(LENS_ANGLE_DEG)
 		));
 
+		submodels.add(new PointCluster(points));
+
 		t.pop();
 
-		return points;
+		return submodels.toArray(new LXModel[0]);
 	}
 }
