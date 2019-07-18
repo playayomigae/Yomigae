@@ -34,7 +34,7 @@ public abstract class PositionedPattern extends LXPattern {
     addParameter("alphaWidth", this.alphaWidth);
   }
 
-  protected float getFalloff(LXParameter param) {
+  protected float getFalloffForParameter(LXParameter param) {
     return 100 / param.getValuef();
   }
 

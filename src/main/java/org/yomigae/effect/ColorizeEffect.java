@@ -49,19 +49,21 @@ public class ColorizeEffect extends LXEffect {
 			// System.out.println("\tcolor :\t" + MathUtils.toHexString(color));
 
 			k = MathUtils.map(LXColor.b(color), 0, 100, minTemp, maxTemp);
-			intensity = LXColor.alpha(color) / 255.0f;
+			intensity = MathUtils.map(LXColor.alpha(color), 0, 255, minIntensity, maxIntensity);
 
 			// System.out.println("\tk :\t" + k);
 			// System.out.println("\tint :\t" + intensity);
 
 			ColorTemp.convertKToRGB(k, rgb);
 			Color.RGBtoHSB(rgb[0], rgb[1], rgb[2], hsb);
+			// colors[i] = LXColor.rgb(rgb[0], rgb[1], rgb[2]);
 
 			// colors[i] = LXColor.rgb(rgb[0], rgb[1], rgb[2]);
 			// colors[i] = LXColor.hsb(hsb[0] *360.0f, hsb[1] * 100.0f, hsb[2] * 100.0f);
 
 			// System.out.println("\trgb :\t" + rgb[0] + "\t" + rgb[1] + "\t" +  rgb[2]);
 			// System.out.println("\thsb :\t" + hsb[0] + "\t" + hsb[1] + "\t" +  hsb[2]);
+			// System.out.println("\tintesity :\t" + intensity);
 
 			// colors[i] = LXColor.hsb(hsb[0] *360.0f, hsb[1] * 100.0f, hsb[2] * 100.0f);
 			colors[i] = LXColor.hsb(hsb[0] *360.0f, hsb[1] * 100.0f, hsb[2] * intensity * 100.0f);
