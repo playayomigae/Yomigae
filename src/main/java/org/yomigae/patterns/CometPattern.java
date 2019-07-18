@@ -18,18 +18,18 @@ public class CometPattern extends PositionedPattern {
   }
 
   public void run(double deltaMs) {
-    float pos = this.pos.getValuef();
-    float falloff = getFalloff();
-    float n = 0;
-    boolean flip = this.flip.getValueb();
+  //   float pos = this.pos.getValuef();
+  //   float falloff = getFalloff();
+  //   float n = 0;
+  //   boolean flip = this.flip.getValueb();
 
-    for (LXPoint p : model.points) {
-      n = getNFromPoint(p);
-      if (flip ? n > pos : n < pos) {
-        colors[p.index] = LXColor.gray(0);
-      } else {
-        colors[p.index] = LXColor.gray(Math.max(0, 100 - falloff * Math.abs(n - pos)));
-      }
-    }
+  //   for (LXPoint p : model.points) {
+  //     n = getNFromPoint(p);
+  //     if (flip ? n > pos : n < pos) {
+  //       colors[p.index] = LXColor.gray(0);
+  //     } else {
+  //       colors[p.index] = LXColor.gray(Math.max(0, 100 - falloff * Math.abs(n - pos)));
+  //     }
+  //   }
   }
 }
