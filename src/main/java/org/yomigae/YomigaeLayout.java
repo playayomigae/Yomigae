@@ -1,11 +1,23 @@
 package org.yomigae;
 
-import heronarts.lx.output.LXOutput;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.Arrays;
+
+import com.google.common.collect.ImmutableSet;
+
+import heronarts.lx.model.LXPoint;
+import heronarts.lx.output.LXDatagram;
+import heronarts.lx.color.LXColor;
 
 import org.yomigae.model.TempleModel;
-import org.yomigae.model.TempleBuilder;
+import org.yomigae.output.StreamingACNDatagram;
+//import org.yomigae.model.TempleBuilder;
 
 public class YomigaeLayout {
+
+	private static final String SACN_ADDRESS_BASE = "239.255.";
 
 	private static final String FIXTURE_TYPE_SPOTLIGHT = "spotlight";
 	private static final String FIXTURE_TYPE_WALL_WASHER = "wall-washer";
@@ -32,8 +44,75 @@ public class YomigaeLayout {
 	// width of "wall washer" fixture, measured from first to last LED center
 	private static final double WALL_WASHER_WIDTH_FEET = 3; // TODO: use actual width
 
-	private final TempleBuilder builder = new TempleBuilder();
+	private static final double WALL_WASHER_DMX_CHANNELS = 35;
+	private static final double SPOTLIGHT_DMX_CHANNELS = 10;
 
+	private static final String METADATA_KEY_DMX_UNIVERSE = "dmx-universe";
+	private static final String METADATA_KEY_DMX_CHANNEL_OFFSET = "dmx-channel-offset";
+
+	//private final TempleBuilder builder = new TempleBuilder();
+	private final TempleModel model;
+
+
+	public YomigaeLayout() {
+		model = new TempleModel();
+
+		// build DMX outputs
+		List<Set<LXPoint>> universePoints = new ArrayList<>();
+		List<int[]> universeIndices = new ArrayList<>();
+
+		// currently assumes points were created in the correct order
+		universePoints.add(model.filterPoints(ImmutableSet.of(TempleModel.FilterFlags.TWELVE, TempleModel.FilterFlags.THREE)));
+		universePoints.add(model.filterPoints(ImmutableSet.of(TempleModel.FilterFlags.TWELVE, TempleModel.FilterFlags.NINE)));
+		universePoints.add(model.filterPoints(ImmutableSet.of(TempleModel.FilterFlags.SIX, TempleModel.FilterFlags.THREE)));
+		universePoints.add(model.filterPoints(ImmutableSet.of(TempleModel.FilterFlags.SIX, TempleModel.FilterFlags.NINE)));
+
+		for (int i = 0; i < universePoints.size(); ++i) {
+			List<LXPoint> points = new ArrayList<>(universePoints.get(i));
+
+			int[] indices = new int[points.size()];
+			universeIndices.add(indices);
+
+			for (int j = 0; j < points.size(); ++j) {
+				indices[j] = points.get(j).index;
+			}
+
+			Arrays.sort(indices);
+		}
+
+		for (int i = 0; i < universePoints.size(); ++i) {
+			LXDatagram d = new StreamingACNDatagram(i + 1, 512, universeIndices.get(i)) {
+				@Override
+				protected LXDatagram copyPoints(int[] colors, byte[] glut, int[] indexBuffer, int offset) {
+					for (int index : indexBuffer) {
+						int color = (index >= 0) ? colors[index] : 0;
+						this.buffer[offset + 0] = glut[((color >> 16) & 0xff)]; // R
+						this.buffer[offset + 1] = glut[((color >> 8) & 0xff)]; // G
+						this.buffer[offset + 2] = glut[(color & 0xff)]; // B
+						this.buffer[offset + 3] = 0; // A
+						this.buffer[offset + 4] = (byte)(LXColor.b(color) / 100.f * 255); // W
+						offset += 5;
+					}
+					return this;
+				}
+			};
+
+			int universeHighByte = 0;
+			int universeLowByte = i + 1;
+
+			try {
+				d.setAddress(SACN_ADDRESS_BASE + universeHighByte + "." + universeLowByte);
+			}
+			catch (Exception e) {
+				System.err.println("Error when setting DMX IP address: " + e.getMessage());
+				e.printStackTrace();
+			}
+
+			model.addDatagram(d);
+		}
+	}
+
+	/*
 	public YomigaeLayout() {
 		builder.defineFixtureType(FIXTURE_TYPE_SPOTLIGHT)
 			.addPoint(0, 0, 0)
@@ -95,46 +174,94 @@ public class YomigaeLayout {
 		builder.setDirection(1);
 		buildHalfTemple(builder, 2, 4);
 
+		model = builder.build();
 
-		builder.build();
+		// build DMX outputs
+		List<Set<LXPoint>> universePoints = new ArrayList<>();
+		List<int[]> universeIndices = new ArrayList<>();
+
+		// currently assumes points were created in the correct order
+		universePoints.add(model.filterPoints(ImmutableSet.of(FilterFlags.NORTH, FilterFlags.EAST)));
+		universePoints.add(model.filterPoints(ImmutableSet.of(FilterFlags.NORTH, FilterFlags.WEST)));
+		universePoints.add(model.filterPoints(ImmutableSet.of(FilterFlags.SOUTH, FilterFlags.EAST)));
+		universePoints.add(model.filterPoints(ImmutableSet.of(FilterFlags.SOUTH, FilterFlags.WEST)));
+
+		for (int i = 0; i < universePoints.size(); ++i) {
+			Set<LXPoint> points = universePoints[i];
+
+			int[] indices = new int[points.size()];
+			universeIndices.add(indices);
+
+			for (int j = 0; j < points.size(); ++j) {
+				indices[j] = points.get(j).index;
+			}
+
+			Arrays.sort(indices);
+		}
+
+		//model.addDatagram();
 	}
 
-	private void buildHalfTemple(TempleBuilder builder, int northDmxUniverse, int southDmxUniverse) {
+	private void buildHalfTemple(TempleBuilder builder, int leftDmxUniverse, int rightDmxUniverse) {
 		builder.setOffset(0).addGap((13 + 11 / 12.) / 2.);
 
 		int dmxOffset = 0;
 
 		for (int i = 0; i < 4; ++i) {
 			builder.addTorii(TempleModel.ToriiType.fromIndex(5 - i))
-				//.assignOutputForGroup(3, 6, new DmxWallWasherOutput(northDmxUniverse, dmxOffset))
-				//.assignOutputForGroup(3, 6, new DmxWallWasherOutput(northDmxUniverse, dmxOffset + 35))
-				//.assignOutputForGroup(3, 6, new DmxWallWasherOutput(southDmxUniverse, dmxOffset))
-				//.assignOutputForGroup(3, 6, new DmxWallWasherOutput(southDmxUniverse, dmxOffset + 35))
+					.assignFixtureMetadata(0, ImmutableMap.of(
+							METADATA_KEY_DMX_UNIVERSE, leftDmxUniverse.toString(),
+							METADATA_KEY_DMX_CHANNEL_OFFSET, dmxOffset.toString()
+					))
+					.assignFixtureMetadata(1, ImmutableMap.of(
+							METADATA_KEY_DMX_UNIVERSE, leftDmxUniverse.toString(),
+							METADATA_KEY_DMX_CHANNEL_OFFSET, (dmxOffset + WALL_WASHER_DMX_CHANNELS).toString()
+					))
+					.assignFixtureMetadata(2, ImmutableMap.of(
+							METADATA_KEY_DMX_UNIVERSE, rightDmxUniverse.toString(),
+							METADATA_KEY_DMX_CHANNEL_OFFSET, dmxOffset.toString()
+					))
+					.assignFixtureMetadata(1, ImmutableMap.of(
+							METADATA_KEY_DMX_UNIVERSE, rightDmxUniverse.toString(),
+							METADATA_KEY_DMX_CHANNEL_OFFSET, (dmxOffset + WALL_WASHER_DMX_CHANNELS).toString()
+					))
 			;
-			dmxOffset += 35 * 2;
+
+			dmxOffset += WALL_WASHER_DMX_CHANNELS * 2;
 		}
 
 		builder.addTorii(TempleModel.ToriiType.T2)
-			//.assignOutputForGroup(3, 6, new DmxWallWasherOutput(northDmxUniverse, dmxOffset))
-			//.assignOutputForGroup(3, 6, new DmxWallWasherOutput(southDmxUniverse, dmxOffset))
+				.assignFixtureMetadata(0, ImmutableMap.of(
+						METADATA_KEY_DMX_UNIVERSE, leftDmxUniverse.toString(),
+						METADATA_KEY_DMX_CHANNEL_OFFSET, dmxOffset.toString()
+				))
+				.assignFixtureMetadata(1, ImmutableMap.of(
+						METADATA_KEY_DMX_UNIVERSE, rightDmxUniverse.toString(),
+						METADATA_KEY_DMX_CHANNEL_OFFSET, dmxOffset.toString()
+				))
 		;
-		dmxOffset += 35;
+		dmxOffset += WALL_WASHER_DMX_CHANNELS;
+
 
 		for (int i = 0; i < 5; ++i) {
 			builder.addTorii(TempleModel.ToriiType.T1)
-				.addGap(i < 5 - 1 ? 1 + 11 / 12. : 0)
-				//.assignOutputForGroup(1, 1, new DmxSpotlightOutput(northDmxUniverse, dmxOffset))
-				//.assignOutputForGroup(1, 1, new DmxSpotlightOutput(southDmxUniverse, dmxOffset))
+					.addGap(i < 5 - 1 ? 1 + 11 / 12. : 0)
+					.assignFixtureMetadata(0, ImmutableMap.of(
+							METADATA_KEY_DMX_UNIVERSE, leftDmxUniverse.toString(),
+							METADATA_KEY_DMX_CHANNEL_OFFSET, dmxOffset.toString()
+					))
+					.assignFixtureMetadata(1, ImmutableMap.of(
+							METADATA_KEY_DMX_UNIVERSE, rightDmxUniverse.toString(),
+							METADATA_KEY_DMX_CHANNEL_OFFSET, dmxOffset.toString()
+					))
 			;
-			dmxOffset += 10;
+			dmxOffset += SPOTLIGHT_DMX_CHANNELS;
+
 		}
 	}
+	*/
 
 	public TempleModel getModel() {
-		return builder.getModel();
-	}
-
-	public LXOutput getOutput() {
-		return null;
+		return model;
 	}
 }

@@ -1,6 +1,7 @@
 package org.yomigae.model;
 
 
+/*
 public interface ITempleBuilder {
 	default ITempleBuilder getParentBuilder() {
 		return null;
@@ -38,3 +39,4 @@ public interface ITempleBuilder {
 		return getParentBuilder().getModel();
 	}
 }
+*/

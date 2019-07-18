@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 
+/*
 public class TempleBuilder implements ITempleBuilder {
 	private List<TempleModel.Torii> toriis = new ArrayList<>();
 	private Map<TempleModel.ToriiType, ToriiTypeBuilder> toriiTypeDefs = new HashMap<>();
@@ -283,3 +284,4 @@ public class TempleBuilder implements ITempleBuilder {
 		}
 	}
 }
+*/

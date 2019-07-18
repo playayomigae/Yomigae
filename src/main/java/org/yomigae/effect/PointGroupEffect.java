@@ -1,43 +1,46 @@
 package org.yomigae.effect;
 
-import java.util.Set;
-import java.util.HashSet;
-import java.util.Arrays;
+import java.util.List;
 
 import heronarts.lx.LX;
+import heronarts.lx.LXEffect;
+import heronarts.lx.model.LXModel;
 import heronarts.lx.model.LXPoint;
 import heronarts.lx.color.LXColor;
 import heronarts.lx.parameter.LXParameter;
 import heronarts.lx.parameter.BooleanParameter;
 
-import org.yomigae.model.TempleModel;
+import org.yomigae.model.PointCluster;
 
-public class PointGroupEffect extends ModelEffect<TempleModel> {
+public class PointGroupEffect extends LXEffect {
   public PointGroupEffect(LX lx) {
     super(lx);
   }
 
 	@Override
   public void run(double deltaMs, double amount) {
-		int[][] pixelGroups = model.getPointGroups();
+		List<LXModel> pointClusters = model.sub(PointCluster.MODEL_KEY);
 
-		for (int[] indices : pixelGroups) {
+		for (LXModel pointCluster : pointClusters) {
+			List<LXPoint> points = pointCluster.getPoints();
+
 			int r = 0, g = 0, b = 0;
-			for (int index : indices) {
+			for (LXPoint point : points) {
+				int index = point.index;
 				int c = colors[index];
 				r += LXColor.red(c);
 				g += LXColor.green(c);
 				b += LXColor.blue(c);
 			}
 
-			r /= indices.length;
-			g /= indices.length;
-			b /= indices.length;
+			r /= points.size();
+			g /= points.size();
+			b /= points.size();
 
 			int avgColor = LXColor.rgb(r, g, b);
 
-			for (int index : indices) {
-				colors[index] = avgColor;
+			for (LXPoint point : points) {
+				colors[point.index] = avgColor;
 			}
 		}
 	}

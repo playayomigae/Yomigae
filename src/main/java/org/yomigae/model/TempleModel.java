@@ -7,11 +7,11 @@ import java.util.HashSet;
 import java.util.Collections;
 import java.util.Arrays;
 
-import com.google.common.collect.Lists;
-import com.google.common.collect.Iterables;
+import com.google.common.collect.ImmutableList;
 
-import heronarts.lx.model.LXPoint;
 import heronarts.lx.model.LXModel;
+import heronarts.lx.model.LXPoint;
+import heronarts.lx.transform.LXTransform;
 
 /**
  * Class to encapsulate temple structure and points.
@@ -30,67 +30,117 @@ import heronarts.lx.model.LXModel;
  *  - hall: contiguous section of T2-T6 toriis
  */
 public class TempleModel extends LXModel {
-
-	private final List<Torii> toriis = new ArrayList<>();
-	private final List<Torii> toriisUnmodifiable = Collections.unmodifiableList(toriis);
+	public static final String MODEL_KEY = "temple";
+	public static final String TUNNEL_KEY = "tunnel-torii";
+	public static final String HALL_KEY = "hall-torii";
+	public static final String SIX_OCLOCK_KEY = "six-oclock";
+	public static final String TWELVE_OCLOCK_KEY = "twelve-oclock";
 
 	public static enum FilterFlags {
-		NORTH, SOUTH, WEST, EAST, HALL, TUNNEL
+		TWELVE, SIX, NINE, THREE, HALL, TUNNEL
 	}
 
-	Set<LXPoint> hallPoints = new HashSet<>();
-	Set<LXPoint> tunnelPoints = new HashSet<>();
-	Set<LXPoint> northPoints = new HashSet<>();
-	Set<LXPoint> southPoints = new HashSet<>();
-	Set<LXPoint> westPoints = new HashSet<>();
-	Set<LXPoint> eastPoints = new HashSet<>();
+	private Set<LXPoint> hallPoints = new HashSet<>();
+	private Set<LXPoint> tunnelPoints = new HashSet<>();
+	private Set<LXPoint> twelveOclockPoints = new HashSet<>();
+	private Set<LXPoint> sixOclockPoints = new HashSet<>();
+	private Set<LXPoint> nineOclockPoints = new HashSet<>();
+	private Set<LXPoint> threeOclockPoints = new HashSet<>();
 
 	public TempleModel() {
-		this(new ArrayList<>());
+		this(new LXTransform());
 	}
 
-	public TempleModel(List<Torii> toriis) {
-		super(toriis.toArray(new LXModel[0]));
+	public TempleModel(LXTransform t) {
+		this(t, ImmutableList.of());
+	}
 
-		this.toriis.addAll(toriis);
+	public TempleModel(LXTransform t, List<String> extraKeys) {
+		super(buildSubmodels(t));
 
-		int midpointIndex = toriis.size() / 2;
-		for (int i = 0; i < toriis.size(); ++i) {
-			Torii torii = toriis.get(i);
-
-			if (torii.getType() == ToriiType.T1) {
-				tunnelPoints.addAll(torii.getPoints());
-			}
-			else {
-				hallPoints.addAll(torii.getPoints());
-			}
-
-			if (i < midpointIndex) {
-				westPoints.addAll(torii.getPoints());
-			}
-			else {
-				eastPoints.addAll(torii.getPoints());
-			}
-
-			northPoints.addAll(torii.getNorthPoints());
-			southPoints.addAll(torii.getSouthPoints());
+		for (LXModel model : sub(TUNNEL_KEY)) {
+			tunnelPoints.addAll(model.getPoints());
 		}
+		for (LXModel model : sub(HALL_KEY)) {
+			hallPoints.addAll(model.getPoints());
+		}
+		for (LXModel model : sub(SIX_OCLOCK_KEY)) {
+			sixOclockPoints.addAll(model.getPoints());
+		}
+		for (LXModel model : sub(TWELVE_OCLOCK_KEY)) {
+			twelveOclockPoints.addAll(model.getPoints());
+		}
+		for (LXModel model : sub(ToriiModel.THREE_OCLOCK_KEY)) {
+			threeOclockPoints.addAll(model.getPoints());
+		}
+		for (LXModel model : sub(ToriiModel.NINE_OCLOCK_KEY)) {
+			nineOclockPoints.addAll(model.getPoints());
+		}
+
+		String[] keys = new String[extraKeys.size() + 1];
+		keys[0] = MODEL_KEY;
+
+		for (int i = 0; i < extraKeys.size(); ++i) {
+			keys[i + 1] = extraKeys.get(i);
+		}
+
+		setKeys(keys);
+	}
+
+	private static void buildHalfTemple(List<LXModel> submodels, int direction, LXTransform t) {
+		t.translate((13 + 11 / 12.f) / 2.f, 0, 0);
+
+		String directionTag = direction < 0 ? SIX_OCLOCK_KEY : TWELVE_OCLOCK_KEY;
+		List<String> tunnelKeys = ImmutableList.of(TUNNEL_KEY, directionTag);
+		List<String> hallKeys = ImmutableList.of(HALL_KEY, directionTag);
+
+		for (int i = 0; i < 4; ++i) {
+			submodels.add(createTorii(direction, ToriiModel.ToriiType.fromIndex(5 - i), t, hallKeys));
+		}
+
+		submodels.add(createTorii(direction, ToriiModel.ToriiType.T2, t, hallKeys));
+
+		for (int i = 0; i < 5; ++i) {
+			submodels.add(createTorii(direction, ToriiModel.ToriiType.T1, t, tunnelKeys));
+			t.translate(i < 5 - 1 ? 1 + 11 / 12.f : 0, 0, 0);
+		}
+	}
+
+	private static ToriiModel createTorii(int direction, ToriiModel.ToriiType type, LXTransform t, List<String> toriiKeys) {
+		ToriiModel torii = new ToriiModel(type, direction, t, toriiKeys);
+		t.translate(torii.columnDepth * direction, 0, 0);
+		return torii;
+	}
+
+	private static LXModel[] buildSubmodels(LXTransform t) {
+		List<LXModel> submodels = new ArrayList<>();
+
+		t.push();
+		buildHalfTemple(submodels, -1, t);
+		t.pop();
+
+		t.push();
+		buildHalfTemple(submodels, 1, t);
+		t.pop();
+
+
+		return submodels.toArray(new LXModel[0]);
 	}
 
 	public Set<LXPoint> filterPoints(Set<FilterFlags> flags) {
 		Set<LXPoint> filteredPoints = new HashSet<>(getPoints());
 
-		if (!flags.contains(FilterFlags.NORTH)) {
-			filteredPoints.removeAll(northPoints);
+		if (!flags.contains(FilterFlags.TWELVE)) {
+			filteredPoints.removeAll(twelveOclockPoints);
 		}
-		if (!flags.contains(FilterFlags.SOUTH)) {
-			filteredPoints.removeAll(southPoints);
+		if (!flags.contains(FilterFlags.SIX)) {
+			filteredPoints.removeAll(sixOclockPoints);
 		}
-		if (!flags.contains(FilterFlags.WEST)) {
-			filteredPoints.removeAll(westPoints);
+		if (!flags.contains(FilterFlags.NINE)) {
+			filteredPoints.removeAll(nineOclockPoints);
 		}
-		if (!flags.contains(FilterFlags.EAST)) {
-			filteredPoints.removeAll(eastPoints);
+		if (!flags.contains(FilterFlags.THREE)) {
+			filteredPoints.removeAll(threeOclockPoints);
 		}
 		if (!flags.contains(FilterFlags.TUNNEL)) {
 			filteredPoints.removeAll(tunnelPoints);
@@ -100,72 +150,5 @@ public class TempleModel extends LXModel {
 		}
 
 		return filteredPoints;
-	}
-
-	public int[][] getPointGroups() {
-		return new int[0][];
-	}
-
-	public List<Torii> getToriis() {
-		return toriisUnmodifiable;
-	}
-
-	public static enum ToriiType {
-		T1, T2, T3, T4, T5, T6;
-
-		private static ToriiType[] values = values();
-
-		public static ToriiType fromIndex(int i) {
-			return values[i];
-		}
-	}
-
-	public static class ToriiConfig {
-	}
-
-	public static class Torii extends LXModel {
-		private TempleModel.ToriiType type;
-		private float centerOffset;
-		private float openingWidth;
-		private float columnWidth, columnHeight, columnDepth;
-		private float beamHeight, beamLength;
-		private float eaveDepth; // calculated
-
-		private List<DirectionalPoint> frontPoints;
-		private List<DirectionalPoint> rearPoints;
-
-		public Torii(ToriiType type, float centerOffset, float openingWidth,
-				float columnWidth, float columnHeight, float columnDepth,
-				float beamHeight, float beamLength,
-				List<DirectionalPoint> frontPoints, List<DirectionalPoint> rearPoints) {
-
-			super(Lists.newArrayList(Iterables.concat(frontPoints, rearPoints)));
-
-			this.type = type;
-			this.centerOffset = centerOffset;
-			this.openingWidth = openingWidth;
-			this.columnWidth = columnWidth;
-			this.columnHeight = columnHeight;
-			this.columnDepth = columnDepth;
-			this.beamHeight = beamHeight;
-			this.beamLength = beamLength;
-
-			eaveDepth = (beamLength - 2 * columnWidth - openingWidth) / 2;
-
-			this.frontPoints = frontPoints;
-			this.rearPoints = rearPoints;
-		}
-
-		public TempleModel.ToriiType getType() {
-			return type;
-		}
-
-		public List<DirectionalPoint> getNorthPoints() {
-			return rearPoints;
-		}
-
-		public List<DirectionalPoint> getSouthPoints() {
-			return frontPoints;
-		}
 	}
 }
