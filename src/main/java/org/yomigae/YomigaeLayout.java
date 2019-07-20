@@ -19,46 +19,15 @@ import org.yomigae.output.DmxFragment;
 import org.yomigae.output.SpotlightDmxFragment;
 import org.yomigae.output.WallWasherDmxFragment;
 import org.yomigae.output.DmxAggregate;
-//import org.yomigae.model.TempleBuilder;
 
 public class YomigaeLayout {
 
 	private static final String SACN_ADDRESS_BASE = "239.255.";
 
-	private static final String FIXTURE_TYPE_SPOTLIGHT = "spotlight";
-	private static final String FIXTURE_TYPE_WALL_WASHER = "wall-washer";
-
-	private static final double[] TORII_OPENING_WIDTH_FEET = new double[] {
-			13 + 0.5 / 12., 17 + 4.5 / 12., 21 + 8.5 / 12., 26 + 0.5 / 12., 30 + 4.5 / 12., 34 + 8.5 / 12.
-	};
-	private static final double[] TORII_COLUMN_WIDTH_FEET = new double[] {
-			3 + 1.5 / 12., 3 + 1.5 / 12., 3 + 1.5 / 12., 3 + 1.5 / 12., 3 + 1.5 / 12., 3 + 1.5 / 12.
-	};
-	private static final double[] TORII_COLUMN_HEIGHT_FEET = new double[] {
-			14 + 11.24 / 12., 19 + 11.24 / 12., 24 + 11.24 / 12., 29 + 11.24 / 12., 34 + 11.24 / 12., 39 + 11.24 / 12.
-	};
-	private static final double[] TORII_COLUMN_DEPTH_FEET = new double[] {
-			8 + 1.5 / 12., 8 + 1.5 / 12., 8 + 1.5 / 12., 8 + 1.5 / 12., 8 + 1.5 / 12., 8 + 1.5 / 12.
-	};
-	private static final double[] TORII_BEAM_HEIGHT_FEET = new double[] {
-			3 + 1.5 / 12., 3 + 1.5 / 12., 3 + 1.5 / 12., 3 + 1.5 / 12., 3 + 1.5 / 12., 3 + 1.5 / 12.
-	};
-	private static final double[] TORII_BEAM_LENGTH_FEET = new double[] {
-			26 + 11.5 / 12., 34 + 2.75 / 12., 41 + 8.75 / 12., 48 + 1.5 / 12., 55 + 11.25 / 12., 60 + 2.5 / 12.
-	};
-
-	// width of "wall washer" fixture, measured from first to last LED center
-	private static final double WALL_WASHER_WIDTH_FEET = 3; // TODO: use actual width
-
 	private static final int SPOTLIGHT_DMX_START_CHANNEL = 0;
 	private static final int WALL_WASHER_DMX_START_CHANNEL = -1;
 
-	private static final String METADATA_KEY_DMX_UNIVERSE = "dmx-universe";
-	private static final String METADATA_KEY_DMX_CHANNEL_OFFSET = "dmx-channel-offset";
-
-	//private final TempleBuilder builder = new TempleBuilder();
 	private final TempleModel model;
-
 
 	public YomigaeLayout() {
 		model = new TempleModel();
