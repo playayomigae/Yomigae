@@ -7,12 +7,18 @@ import java.util.Arrays;
 
 import com.google.common.collect.ImmutableSet;
 
+import heronarts.lx.model.LXModel;
 import heronarts.lx.model.LXPoint;
 import heronarts.lx.output.LXDatagram;
 import heronarts.lx.color.LXColor;
 
 import org.yomigae.model.TempleModel;
+import org.yomigae.model.ModelCollection;
 import org.yomigae.output.StreamingACNDatagram;
+import org.yomigae.output.DmxFragment;
+import org.yomigae.output.SpotlightDmxFragment;
+import org.yomigae.output.WallWasherDmxFragment;
+import org.yomigae.output.DmxAggregate;
 //import org.yomigae.model.TempleBuilder;
 
 public class YomigaeLayout {
@@ -44,8 +50,8 @@ public class YomigaeLayout {
 	// width of "wall washer" fixture, measured from first to last LED center
 	private static final double WALL_WASHER_WIDTH_FEET = 3; // TODO: use actual width
 
-	private static final double WALL_WASHER_DMX_CHANNELS = 35;
-	private static final double SPOTLIGHT_DMX_CHANNELS = 10;
+	private static final int SPOTLIGHT_DMX_START_CHANNEL = 0;
+	private static final int WALL_WASHER_DMX_START_CHANNEL = -1;
 
 	private static final String METADATA_KEY_DMX_UNIVERSE = "dmx-universe";
 	private static final String METADATA_KEY_DMX_CHANNEL_OFFSET = "dmx-channel-offset";
@@ -61,44 +67,77 @@ public class YomigaeLayout {
 		List<Set<LXPoint>> universePoints = new ArrayList<>();
 		List<int[]> universeIndices = new ArrayList<>();
 
-		// currently assumes points were created in the correct order
-		universePoints.add(model.filterClusterPoints(ImmutableSet.of(TempleModel.FilterFlags.TWELVE, TempleModel.FilterFlags.THREE, TempleModel.FilterFlags.TUNNEL, TempleModel.FilterFlags.HALL)));
-		universePoints.add(model.filterClusterPoints(ImmutableSet.of(TempleModel.FilterFlags.TWELVE, TempleModel.FilterFlags.NINE, TempleModel.FilterFlags.TUNNEL, TempleModel.FilterFlags.HALL)));
-		universePoints.add(model.filterClusterPoints(ImmutableSet.of(TempleModel.FilterFlags.SIX, TempleModel.FilterFlags.THREE, TempleModel.FilterFlags.TUNNEL, TempleModel.FilterFlags.HALL)));
-		universePoints.add(model.filterClusterPoints(ImmutableSet.of(TempleModel.FilterFlags.SIX, TempleModel.FilterFlags.NINE, TempleModel.FilterFlags.TUNNEL, TempleModel.FilterFlags.HALL)));
+		String[] universeSpotlightQueries = new String[] {
+			"torii.twelve-oclock spotlight.three-oclock",
+			"torii.six-oclock spotlight.three-oclock",
+			"torii.twelve-oclock spotlight.nine-oclock",
+			"torii.six-oclock spotlight.nine-oclock"
+		};
+		String[] universeWallWasherQueries = new String[] {
+			"torii.twelve-oclock wall-washer.three-oclock",
+			"torii.six-oclock wall-washer.three-oclock",
+			"torii.twelve-oclock wall-washer.nine-oclock",
+			"torii.six-oclock wall-washer.nine-oclock"
+		};
 
-		for (int i = 0; i < universePoints.size(); ++i) {
-			List<LXPoint> points = new ArrayList<>(universePoints.get(i));
+		for (int universeIndex = 0; universeIndex < universeSpotlightQueries.length; ++universeIndex) {
+			int universeNumber = universeIndex + 1;
+			List<LXModel> spotlights = ModelCollection.filterChildren(model, universeSpotlightQueries[universeIndex]);
+			List<LXModel> wallWashers = ModelCollection.filterChildren(model, universeWallWasherQueries[universeIndex]);
 
-			int[] indices = new int[points.size()];
-			universeIndices.add(indices);
+			List<DmxFragment> spotlightFragments = new ArrayList<>();
+			List<DmxFragment> wallWasherFragments = new ArrayList<>();
 
-			for (int j = 0; j < points.size(); ++j) {
-				indices[j] = points.get(j).index;
+			System.out.println("Constructing output for universe " + universeNumber);
+
+			int lastDmxOffset = 0;
+			if (SPOTLIGHT_DMX_START_CHANNEL >= 0) {
+				lastDmxOffset = SPOTLIGHT_DMX_START_CHANNEL;
 			}
 
-			Arrays.sort(indices);
-		}
-
-		for (int i = 0; i < universePoints.size(); ++i) {
-			LXDatagram d = new StreamingACNDatagram(i + 1, 512, universeIndices.get(i)) {
-				@Override
-				protected LXDatagram copyPoints(int[] colors, byte[] glut, int[] indexBuffer, int offset) {
-					for (int index : indexBuffer) {
-						int color = (index >= 0) ? colors[index] : 0;
-						this.buffer[offset + 0] = glut[((color >> 16) & 0xff)]; // R
-						this.buffer[offset + 1] = glut[((color >> 8) & 0xff)]; // G
-						this.buffer[offset + 2] = glut[(color & 0xff)]; // B
-						this.buffer[offset + 3] = 0; // A
-						this.buffer[offset + 4] = (byte)(LXColor.b(color) / 100.f * 255); // W
-						offset += 5;
-					}
-					return this;
+			System.out.println("Spotlight start address: " + lastDmxOffset);
+			for (LXModel m : spotlights) {
+				List<LXModel> pointClusters = ModelCollection.filterChildren(m, "point-cluster");
+				int[] indexBuffer = new int[pointClusters.size()];
+				for (int i = 0; i < pointClusters.size(); ++i) {
+					indexBuffer[i] = pointClusters.get(i).getPoints().get(0).index;
 				}
-			};
 
-			int universeHighByte = 0;
-			int universeLowByte = i + 1;
+				DmxFragment frag = new SpotlightDmxFragment(lastDmxOffset, indexBuffer);
+				lastDmxOffset += frag.getNumChannels();
+				spotlightFragments.add(frag);
+			}
+
+			System.out.println("Spotlight end address: " + lastDmxOffset);
+
+			if (WALL_WASHER_DMX_START_CHANNEL >= 0) {
+				lastDmxOffset = WALL_WASHER_DMX_START_CHANNEL;
+			}
+
+			System.out.println("Wall-washer start address: " + lastDmxOffset);
+			for (LXModel m : wallWashers) {
+				List<LXModel> pointClusters = ModelCollection.filterChildren(m, "point-cluster");
+				int[] indexBuffer = new int[pointClusters.size()];
+				for (int i = 0; i < pointClusters.size(); ++i) {
+					indexBuffer[i] = pointClusters.get(i).getPoints().get(0).index;
+				}
+
+				DmxFragment frag = new WallWasherDmxFragment(lastDmxOffset, indexBuffer);
+				lastDmxOffset += frag.getNumChannels();
+				wallWasherFragments.add(frag);
+			}
+
+			System.out.println("Wall-washer end address: " + lastDmxOffset);
+
+			System.out.println("Spotlights: " + spotlightFragments.size());
+			System.out.println("Wall-washers: " + wallWasherFragments.size());
+
+			List<DmxFragment> allFragments = new ArrayList<>(spotlightFragments);
+			allFragments.addAll(wallWasherFragments);
+			LXDatagram d = new StreamingACNDatagram(universeNumber, DmxAggregate.fromFragments(allFragments));
+
+			int universeHighByte = (0xff00 & universeNumber) >> 8;
+			int universeLowByte = 0xff & universeNumber;
 
 			try {
 				String address = SACN_ADDRESS_BASE + universeHighByte + "." + universeLowByte;
@@ -113,155 +152,6 @@ public class YomigaeLayout {
 			model.addDatagram(d);
 		}
 	}
-
-	/*
-	public YomigaeLayout() {
-		builder.defineFixtureType(FIXTURE_TYPE_SPOTLIGHT)
-			.addPoint(0, 0, 0)
-			.withDirection(0, 1, 0)
-			.withLensAngle(Math.toRadians(40));
-
-		TempleBuilder.FixtureTypeBuilder wallWasherBuilder = builder.defineFixtureType(FIXTURE_TYPE_WALL_WASHER);
-
-		for (int i = 0; i < 6; ++i) {
-			wallWasherBuilder.newPointGroup();
-
-			for (int j = 0; j < 3; ++j) {
-				double x = (3 * i + j) * WALL_WASHER_WIDTH_FEET / (18 - 1);
-				wallWasherBuilder.addPoint(x, 0, 0)
-					.withDirection(0, 0, 1)
-					.withLensAngle(Math.toRadians(40));
-			}
-		}
-
-		for (int i = 0; i < 6; ++i) {
-			TempleBuilder.ToriiTypeBuilder b = builder.defineToriiType(TempleModel.ToriiType.fromIndex(i))
-				.withOpeningWidth(TORII_OPENING_WIDTH_FEET[i])
-				.withColumnWidth(TORII_COLUMN_WIDTH_FEET[i])
-				.withColumnHeight(TORII_COLUMN_HEIGHT_FEET[i])
-				.withColumnDepth(TORII_COLUMN_DEPTH_FEET[i])
-				.withBeamHeight(TORII_BEAM_HEIGHT_FEET[i])
-				.withBeamLength(TORII_BEAM_LENGTH_FEET[i]);
-
-			switch (i) {
-				case 0: // T1
-					b.addFixture(FIXTURE_TYPE_SPOTLIGHT)
-							.withPositionFromColumnBase(0, 0, 6 + 6.75 / 12.) // 2 meters out
-							//.withRotation()
-					;
-					break;
-				case 1: // T2
-					b.addFixture(FIXTURE_TYPE_WALL_WASHER)
-							.withPositionFromEaveEnd(0, 0, 6 / 12.)
-							//.withRotation()
-					;
-					break;
-				default: // T3-T6
-					b.addFixture(FIXTURE_TYPE_WALL_WASHER)
-							.withPositionFromEaveEnd(-1.5, 0, 6 / 12.)
-							//.withRotation()
-					;
-					b.addFixture(FIXTURE_TYPE_WALL_WASHER)
-							.withPositionFromEaveEnd(1.5, 0, 6 / 12.)
-							//.withRotation()
-					;
-			}
-		}
-
-		// building left side
-		builder.setDirection(-1);
-		buildHalfTemple(builder, 1, 3);
-
-		// building right side
-		builder.setDirection(1);
-		buildHalfTemple(builder, 2, 4);
-
-		model = builder.build();
-
-		// build DMX outputs
-		List<Set<LXPoint>> universePoints = new ArrayList<>();
-		List<int[]> universeIndices = new ArrayList<>();
-
-		// currently assumes points were created in the correct order
-		universePoints.add(model.filterPoints(ImmutableSet.of(FilterFlags.NORTH, FilterFlags.EAST)));
-		universePoints.add(model.filterPoints(ImmutableSet.of(FilterFlags.NORTH, FilterFlags.WEST)));
-		universePoints.add(model.filterPoints(ImmutableSet.of(FilterFlags.SOUTH, FilterFlags.EAST)));
-		universePoints.add(model.filterPoints(ImmutableSet.of(FilterFlags.SOUTH, FilterFlags.WEST)));
-
-		for (int i = 0; i < universePoints.size(); ++i) {
-			Set<LXPoint> points = universePoints[i];
-
-			int[] indices = new int[points.size()];
-			universeIndices.add(indices);
-
-			for (int j = 0; j < points.size(); ++j) {
-				indices[j] = points.get(j).index;
-			}
-
-			Arrays.sort(indices);
-		}
-
-		//model.addDatagram();
-	}
-
-	private void buildHalfTemple(TempleBuilder builder, int leftDmxUniverse, int rightDmxUniverse) {
-		builder.setOffset(0).addGap((13 + 11 / 12.) / 2.);
-
-		int dmxOffset = 0;
-
-		for (int i = 0; i < 4; ++i) {
-			builder.addTorii(TempleModel.ToriiType.fromIndex(5 - i))
-					.assignFixtureMetadata(0, ImmutableMap.of(
-							METADATA_KEY_DMX_UNIVERSE, leftDmxUniverse.toString(),
-							METADATA_KEY_DMX_CHANNEL_OFFSET, dmxOffset.toString()
-					))
-					.assignFixtureMetadata(1, ImmutableMap.of(
-							METADATA_KEY_DMX_UNIVERSE, leftDmxUniverse.toString(),
-							METADATA_KEY_DMX_CHANNEL_OFFSET, (dmxOffset + WALL_WASHER_DMX_CHANNELS).toString()
-					))
-					.assignFixtureMetadata(2, ImmutableMap.of(
-							METADATA_KEY_DMX_UNIVERSE, rightDmxUniverse.toString(),
-							METADATA_KEY_DMX_CHANNEL_OFFSET, dmxOffset.toString()
-					))
-					.assignFixtureMetadata(1, ImmutableMap.of(
-							METADATA_KEY_DMX_UNIVERSE, rightDmxUniverse.toString(),
-							METADATA_KEY_DMX_CHANNEL_OFFSET, (dmxOffset + WALL_WASHER_DMX_CHANNELS).toString()
-					))
-			;
-
-			dmxOffset += WALL_WASHER_DMX_CHANNELS * 2;
-		}
-
-		builder.addTorii(TempleModel.ToriiType.T2)
-				.assignFixtureMetadata(0, ImmutableMap.of(
-						METADATA_KEY_DMX_UNIVERSE, leftDmxUniverse.toString(),
-						METADATA_KEY_DMX_CHANNEL_OFFSET, dmxOffset.toString()
-				))
-				.assignFixtureMetadata(1, ImmutableMap.of(
-						METADATA_KEY_DMX_UNIVERSE, rightDmxUniverse.toString(),
-						METADATA_KEY_DMX_CHANNEL_OFFSET, dmxOffset.toString()
-				))
-		;
-		dmxOffset += WALL_WASHER_DMX_CHANNELS;
-
-
-		for (int i = 0; i < 5; ++i) {
-			builder.addTorii(TempleModel.ToriiType.T1)
-					.addGap(i < 5 - 1 ? 1 + 11 / 12. : 0)
-					.assignFixtureMetadata(0, ImmutableMap.of(
-							METADATA_KEY_DMX_UNIVERSE, leftDmxUniverse.toString(),
-							METADATA_KEY_DMX_CHANNEL_OFFSET, dmxOffset.toString()
-					))
-					.assignFixtureMetadata(1, ImmutableMap.of(
-							METADATA_KEY_DMX_UNIVERSE, rightDmxUniverse.toString(),
-							METADATA_KEY_DMX_CHANNEL_OFFSET, dmxOffset.toString()
-					))
-			;
-			dmxOffset += SPOTLIGHT_DMX_CHANNELS;
-
-		}
-	}
-	*/
 
 	public TempleModel getModel() {
 		return model;

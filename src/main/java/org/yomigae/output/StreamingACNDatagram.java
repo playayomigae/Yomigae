@@ -39,6 +39,7 @@ public class StreamingACNDatagram extends LXDatagram {
   private final static int DEFAULT_UNIVERSE_NUMBER = 1;
 
   private final int[] indexBuffer;
+  private DmxFragment fragment;
 
   /**
    * The universe number that this packet sends to.
@@ -83,6 +84,12 @@ public class StreamingACNDatagram extends LXDatagram {
   protected StreamingACNDatagram(int universeNumber, int dataSize) {
     this(universeNumber, dataSize, null);
   }
+
+  public StreamingACNDatagram(int universeNumber, DmxFragment fragment) {
+		this(universeNumber, fragment.getNumChannels());
+
+		this.fragment = fragment;
+	}
 
   protected StreamingACNDatagram(int universeNumber, int dataSize, int[] indexBuffer) {
     super(OFFSET_DMX_DATA + dataSize);
@@ -236,5 +243,15 @@ public class StreamingACNDatagram extends LXDatagram {
   public void onSend(int[] colors, byte[] glut) {
     advanceFrame();
     copyPoints(colors, glut, this.indexBuffer, OFFSET_DMX_DATA);
+  }
+
+  @Override
+  protected LXDatagram copyPoints(int[] colors, byte[] glut, int[] indexBuffer, int offset) {
+		if (fragment == null) {
+			return super.copyPoints(colors, glut, indexBuffer, offset);
+		}
+
+		fragment.applyToBuffer(colors, buffer, offset);
+		return this;
   }
 }
