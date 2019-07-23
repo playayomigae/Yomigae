@@ -15,9 +15,9 @@ public class UIFixtureType extends UIConfig {
   public UIFixtureType(final LXStudio.UI ui, LX lx) {
     super(ui, title, filename);
     this.lx = lx;
-    registerDiscreteParameter("Type", 1, 1, Output.LightType.OPPSKPAR.getValue() + 1);
+    registerDiscreteParameter("Type", 1, 1, Output.LightType.PRODPAR.getValue() + 1);
     // TODO(tracy): UIToggleSet is crashing for some reason, just use a discrete knob for now.
-    String[] toggleOptions = {"LaLuce", "Prod Par", "Prod Wash"};
+    String[] toggleOptions = {"Prod Par", "Prod Wash"};
     buildUI(ui);
   }
 

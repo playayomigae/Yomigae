@@ -18,10 +18,8 @@ public class Output {
   private static final Logger logger = Logger.getLogger(Output.class.getName());
 
   public enum LightType {
-    LALUCE(1),
-    PRODPAR(2),
-    PRODWASH(3),
-    OPPSKPAR(4);
+    PRODPAR(1),
+    PRODWASH(2);
 
     private int value;
     private static Map map = new HashMap<Integer, LightType>();
@@ -119,19 +117,6 @@ public class Output {
         dmxChannelsForUniverse);
 
     switch (lightType) {
-      case LALUCE:
-        FixtureLaluce24Par laluceFixture = new FixtureLaluce24Par(1);
-        e131Datagram.addFixture(laluceFixture);
-        e131Datagram.addFixture(laluceFixture);
-        break;
-      case OPPSKPAR:
-        // NOTE(tracy): I'm testing the OPPSk along with existing LaLuce so I can test multiple light
-        // types in a single universe.
-        //laluceFixture = new FixtureLaluce24Par(1);
-        FixtureOPPSk7LedPar oppSkFixture = new FixtureOPPSk7LedPar(1);
-        //e131Datagram.addFixture(laluceFixture);
-        e131Datagram.addFixture(oppSkFixture);
-        break;
       case PRODPAR:
         FixtureProdPar prodParFixture = new FixtureProdPar(1);
         e131Datagram.addFixture(prodParFixture);
