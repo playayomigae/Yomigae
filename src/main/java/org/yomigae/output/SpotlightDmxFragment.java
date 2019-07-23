@@ -41,22 +41,24 @@ public class SpotlightDmxFragment extends DmxFragment {
 
 	@Override
 	public void applyToBuffer(int[] colors, byte[] buffer, int offset) {
+		int fragmentOffset = offset + startChannel;
+
 		for (int ch = 0; ch < CHANNEL_COUNT; ch++) {
 			// These are probably already 0, but just to be sure.
-			buffer[offset + ch] = 0;
+			buffer[fragmentOffset + ch] = 0;
 		}
 
 		// Currently set hardware dimmer to full.
 		// We will eventually control this via LX Studio UI controls, one per fixture type.
-		buffer[offset + CHANNEL_DIMMER] = (byte)0xff;
+		buffer[fragmentOffset + CHANNEL_DIMMER] = (byte)0xff;
 
 		int index = indexBuffer[0];
 		int c = colors[index];
 
-		buffer[offset + CHANNEL_R] = LXColor.red(c);
-		buffer[offset + CHANNEL_G] = LXColor.green(c);
-		buffer[offset + CHANNEL_B] = LXColor.blue(c);
-		buffer[offset + CHANNEL_W] = 0;
-		buffer[offset + CHANNEL_A] = 0;
+		buffer[fragmentOffset + CHANNEL_R] = LXColor.red(c);
+		buffer[fragmentOffset + CHANNEL_G] = LXColor.green(c);
+		buffer[fragmentOffset + CHANNEL_B] = LXColor.blue(c);
+		buffer[fragmentOffset + CHANNEL_W] = 0;
+		buffer[fragmentOffset + CHANNEL_A] = 0;
 	}
 }

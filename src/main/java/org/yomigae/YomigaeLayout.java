@@ -24,8 +24,8 @@ public class YomigaeLayout {
 
 	private static final String SACN_ADDRESS_BASE = "239.255.";
 
-	private static final int SPOTLIGHT_DMX_START_CHANNEL = 0;
-	private static final int WALL_WASHER_DMX_START_CHANNEL = -1;
+	private static final int SPOTLIGHT_DMX_START_CHANNEL = 1 - 1;
+	private static final int WALL_WASHER_DMX_START_CHANNEL = 101 - 1;
 
 	private final TempleModel model;
 
@@ -57,14 +57,14 @@ public class YomigaeLayout {
 			List<DmxFragment> spotlightFragments = new ArrayList<>();
 			List<DmxFragment> wallWasherFragments = new ArrayList<>();
 
-			System.out.println("Constructing output for universe " + universeNumber);
+			System.out.println("\nConstructing output for universe " + universeNumber);
 
 			int lastDmxOffset = 0;
 			if (SPOTLIGHT_DMX_START_CHANNEL >= 0) {
 				lastDmxOffset = SPOTLIGHT_DMX_START_CHANNEL;
 			}
 
-			System.out.println("Spotlight start address: " + lastDmxOffset);
+			System.out.println("Spotlight start address: " + (lastDmxOffset + 1));
 			for (LXModel m : spotlights) {
 				List<LXModel> pointClusters = ModelCollection.filterChildren(m, "point-cluster");
 				int[] indexBuffer = new int[pointClusters.size()];
@@ -83,7 +83,7 @@ public class YomigaeLayout {
 				lastDmxOffset = WALL_WASHER_DMX_START_CHANNEL;
 			}
 
-			System.out.println("Wall-washer start address: " + lastDmxOffset);
+			System.out.println("Wall-washer start address: " + (lastDmxOffset + 1));
 			for (LXModel m : wallWashers) {
 				List<LXModel> pointClusters = ModelCollection.filterChildren(m, "point-cluster");
 				int[] indexBuffer = new int[pointClusters.size()];
