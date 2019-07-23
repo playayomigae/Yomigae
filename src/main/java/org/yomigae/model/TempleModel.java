@@ -130,11 +130,9 @@ public class TempleModel extends LXModel {
 		List<String> tunnelKeys = ImmutableList.of(TUNNEL_KEY, directionTag);
 		List<String> hallKeys = ImmutableList.of(HALL_KEY, directionTag);
 
-		for (int i = 0; i < 4; ++i) {
+		for (int i = 0; i < 5; ++i) {
 			submodels.add(createTorii(direction, ToriiModel.ToriiType.fromIndex(5 - i), t, hallKeys));
 		}
-
-		submodels.add(createTorii(direction, ToriiModel.ToriiType.T2, t, hallKeys));
 
 		for (int i = 0; i < 5; ++i) {
 			submodels.add(createTorii(direction, ToriiModel.ToriiType.T1, t, tunnelKeys));
