@@ -2,7 +2,6 @@ package org.yomigae.model;
 
 import heronarts.lx.model.LXPoint;
 
-
 public class DirectionalPoint extends LXPoint {
 	public final float[] direction = new float[3];
 	public float lensAngle = (float)(Math.PI / 2);

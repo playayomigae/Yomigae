@@ -13,10 +13,10 @@ import heronarts.lx.parameter.BooleanParameter;
 import org.yomigae.model.TempleModel;
 
 public class TempleMaskEffect extends ModelEffect<TempleModel> {
-	public final BooleanParameter north = new BooleanParameter("north", true);
-	public final BooleanParameter south = new BooleanParameter("south", true);
-	public final BooleanParameter west = new BooleanParameter("west", true);
-	public final BooleanParameter east = new BooleanParameter("east", true);
+	public final BooleanParameter twelve = new BooleanParameter("twelve", true);
+	public final BooleanParameter six = new BooleanParameter("six", true);
+	public final BooleanParameter nine = new BooleanParameter("nine", true);
+	public final BooleanParameter three = new BooleanParameter("three", true);
 	public final BooleanParameter tunnel = new BooleanParameter("tunnel", true);
 	public final BooleanParameter hall = new BooleanParameter("hall", true);
 
@@ -25,10 +25,10 @@ public class TempleMaskEffect extends ModelEffect<TempleModel> {
   public TempleMaskEffect(LX lx) {
     super(lx);
 
-    addParameter(north);
-    addParameter(south);
-    addParameter(west);
-    addParameter(east);
+    addParameter(twelve);
+    addParameter(six);
+    addParameter(nine);
+    addParameter(three);
     addParameter(tunnel);
     addParameter(hall);
 
@@ -40,17 +40,17 @@ public class TempleMaskEffect extends ModelEffect<TempleModel> {
 	private void refreshPoints() {
 		Set<TempleModel.FilterFlags> flags = new HashSet<>();
 
-		if (north.isOn()) {
-			flags.add(TempleModel.FilterFlags.NORTH);
+		if (twelve.isOn()) {
+			flags.add(TempleModel.FilterFlags.TWELVE);
 		}
-		if (south.isOn()) {
-			flags.add(TempleModel.FilterFlags.SOUTH);
+		if (six.isOn()) {
+			flags.add(TempleModel.FilterFlags.SIX);
 		}
-		if (west.isOn()) {
-			flags.add(TempleModel.FilterFlags.WEST);
+		if (nine.isOn()) {
+			flags.add(TempleModel.FilterFlags.NINE);
 		}
-		if (east.isOn()) {
-			flags.add(TempleModel.FilterFlags.EAST);
+		if (three.isOn()) {
+			flags.add(TempleModel.FilterFlags.THREE);
 		}
 		if (tunnel.isOn()) {
 			flags.add(TempleModel.FilterFlags.TUNNEL);
