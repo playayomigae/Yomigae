@@ -16,9 +16,8 @@ public class FixtureProdPar extends DmxFixture {
    * @return The number of bytes added to the packet.
    */
   protected int postRGBHook(byte[] buffer, int offset) {
-    buffer[offset] = (byte)Yomigae.prodParWhiteControl.whiteOverride;
-    buffer[offset+1] = (byte)Yomigae.prodParWhiteControl.amberOverride;
-    buffer[offset+2] = (byte)Yomigae.prodParWhiteControl.uvOverride;
+    buffer[offset] = (byte)Yomigae.parWhiteControl.whiteOverride;
+    buffer[offset+1] = (byte)Yomigae.parWhiteControl.amberOverride;
     return 3;
   }
 }

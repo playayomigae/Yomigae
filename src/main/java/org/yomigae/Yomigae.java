@@ -3,7 +3,6 @@ package org.yomigae;
 import com.google.common.reflect.ClassPath;
 import heronarts.lx.LXEffect;
 import heronarts.lx.LXPattern;
-import heronarts.lx.model.LXModel;
 import heronarts.lx.studio.LXStudio;
 
 import java.io.IOException;
@@ -70,11 +69,9 @@ public class Yomigae extends PApplet {
   public static PApplet pApplet;
   public static final int GLOBAL_FRAME_RATE = 40;
 
-  public static UIWhiteControl laluceWhiteControl;
-  public static UIWhiteControl prodParWhiteControl;
-  public static UIWhiteControl prodWashWhiteControl;
-  public static UIWhiteControl oppSkWhiteControl;
-  public static UIFixtureType fixtureTypeControl;
+  public static UIDimmer dimmer;
+  public static UIWhiteControl parWhiteControl;
+  public static UIWhiteControl wallWasherWhiteControl;
 
     @Override
   public void settings() {
@@ -149,19 +146,15 @@ public class Yomigae extends PApplet {
 
     lx.ui.setResizable(true);
 
-    fixtureTypeControl = (UIFixtureType) new UIFixtureType(lx.ui, lx).setExpanded(true).addToContainer(lx.ui.leftPane.global);
-
-    laluceWhiteControl = (UIWhiteControl) new UIWhiteControl(lx.ui, "LALUCE WHITE", "laluce_whites").
-        setExpanded(false).addToContainer(lx.ui.leftPane.global);
-    prodParWhiteControl = (UIWhiteControl) new UIWhiteControl(lx.ui, "PRODPAR WHITE", "prodpar_whites")
+    dimmer = (UIDimmer) new UIDimmer(lx.ui, "DIMMER", "dimmer")
         .setExpanded(false).addToContainer(lx.ui.leftPane.global);
-    prodWashWhiteControl = (UIWhiteControl) new UIWhiteControl(lx.ui, "PRODWASH WHITE", "prodwash_whites")
+    parWhiteControl = (UIWhiteControl) new UIWhiteControl(lx.ui, "WHITE : PAR", "white_par")
         .setExpanded(false).addToContainer(lx.ui.leftPane.global);
-    oppSkWhiteControl = (UIWhiteControl) new UIWhiteControl(lx.ui, "OPPSK WHITE", "oppskpar_whites")
+    wallWasherWhiteControl = (UIWhiteControl) new UIWhiteControl(lx.ui, "WHITE : WALL WASHER", "white_wallwasher")
         .setExpanded(false).addToContainer(lx.ui.leftPane.global);
 
     if (enableOutput) {
-      Output.configureE131Output(lx, Output.LightType.OPPSKPAR);
+      // Output.configureE131Output(lx, Output.LightType.PRODPAR);
       //Output.configureArtnetOutput(lx);
     }
     if (disableOutputOnStart)
