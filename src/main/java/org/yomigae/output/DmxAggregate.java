@@ -46,6 +46,7 @@ public class DmxAggregate extends DmxFragment {
 	public void applyToBuffer(int[] colors, byte[] buffer, int offset) {
 		for (DmxFragment frag : fragments) {
 			frag.applyToBuffer(colors, buffer, offset);
+			offset += frag.getNumChannels();
 		}
 	}
 }

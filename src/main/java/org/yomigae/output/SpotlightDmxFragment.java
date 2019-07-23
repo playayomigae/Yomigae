@@ -3,27 +3,60 @@ package org.yomigae.output;
 import heronarts.lx.color.LXColor;
 
 public class SpotlightDmxFragment extends DmxFragment {
-	public static final int COLOR_CHANNELS = 5;
+	public static final int CHANNEL_COUNT = 10;
+
+	/*
+	DMX channels
+
+	0 : master dimmer
+	1 : strobe
+	2 : R
+	3 : G
+	4 : B
+	5 : W
+	6 : A
+	7 : color wheel
+	8 : effect selection
+	9 : effect speed
+	*/
+
+	private static final int CHANNEL_DIMMER = 0;
+	private static final int CHANNEL_R = 2;
+	private static final int CHANNEL_G = 3;
+	private static final int CHANNEL_B = 4;
+	private static final int CHANNEL_W = 5;
+	private static final int CHANNEL_A = 6;
 
 	private final int[] indexBuffer;
 
 	public SpotlightDmxFragment(int startChannel, int[] indexBuffer) {
-		super(startChannel, COLOR_CHANNELS * indexBuffer.length);
+		super(startChannel, CHANNEL_COUNT);
+
+		if (indexBuffer.length > 1) {
+			throw new RuntimeException("SpotlightDmxFragment should correspond to only 1 point.");
+		}
 
 		this.indexBuffer = indexBuffer;
 	}
 
 	@Override
 	public void applyToBuffer(int[] colors, byte[] buffer, int offset) {
-		for (int i = 0; i < indexBuffer.length; ++i) {
-			int index = indexBuffer[i];
-			int c = colors[index];
-
-			buffer[offset + i * COLOR_CHANNELS + 0] = LXColor.red(c);
-			buffer[offset + i * COLOR_CHANNELS + 1] = LXColor.blue(c);
-			buffer[offset + i * COLOR_CHANNELS + 2] = LXColor.green(c);
-			buffer[offset + i * COLOR_CHANNELS + 3] = 0;
-			buffer[offset + i * COLOR_CHANNELS + 4] = 0;
+		for (int ch = 0; ch < CHANNEL_COUNT; ch++) {
+			// These are probably already 0, but just to be sure.
+			buffer[offset + ch] = 0;
 		}
+
+		// Currently set hardware dimmer to full.
+		// We will eventually control this via LX Studio UI controls, one per fixture type.
+		buffer[offset + CHANNEL_DIMMER] = (byte)0xff;
+
+		int index = indexBuffer[0];
+		int c = colors[index];
+
+		buffer[offset + CHANNEL_R] = LXColor.red(c);
+		buffer[offset + CHANNEL_G] = LXColor.green(c);
+		buffer[offset + CHANNEL_B] = LXColor.blue(c);
+		buffer[offset + CHANNEL_W] = 0;
+		buffer[offset + CHANNEL_A] = 0;
 	}
 }
