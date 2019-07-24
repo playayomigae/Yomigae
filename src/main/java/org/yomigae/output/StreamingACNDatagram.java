@@ -86,7 +86,7 @@ public class StreamingACNDatagram extends LXDatagram {
   }
 
   public StreamingACNDatagram(int universeNumber, DmxFragment fragment) {
-		this(universeNumber, fragment.getNumChannels());
+		this(universeNumber, 512);
 
 		this.fragment = fragment;
 	}
