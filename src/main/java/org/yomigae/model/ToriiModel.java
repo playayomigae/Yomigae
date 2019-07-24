@@ -118,11 +118,11 @@ public class ToriiModel extends LXModel {
 
 				t.push();
 				t.translate(0, 0, zOffset);
-				submodels.add(new SpotlightModel(t, ImmutableList.of(NINE_OCLOCK_KEY)));
+				submodels.add(new SpotlightModel(t, ImmutableList.of(THREE_OCLOCK_KEY)));
 				t.pop();
 				t.push();
 				t.translate(0, 0, -zOffset);
-				submodels.add(new SpotlightModel(t, ImmutableList.of(THREE_OCLOCK_KEY)));
+				submodels.add(new SpotlightModel(t, ImmutableList.of(NINE_OCLOCK_KEY)));
 				t.pop();
 
 				break;
@@ -132,11 +132,11 @@ public class ToriiModel extends LXModel {
 
 				t.push();
 				t.translate(0, columnHeight, zOffset);
-				submodels.add(new WallWasherModel(t, ImmutableList.of(NINE_OCLOCK_KEY)));
+				submodels.add(new WallWasherModel(t, ImmutableList.of(THREE_OCLOCK_KEY)));
 				t.pop();
 				t.push();
 				t.translate(0, columnHeight, -zOffset);
-				submodels.add(new WallWasherModel(t, ImmutableList.of(THREE_OCLOCK_KEY)));
+				submodels.add(new WallWasherModel(t, ImmutableList.of(NINE_OCLOCK_KEY)));
 				t.pop();
 
 				break;
@@ -145,21 +145,21 @@ public class ToriiModel extends LXModel {
 				zOffset = 6 / 12.f - beamLength / 2;
 
 				t.push();
-				t.translate(-1.5f, columnHeight, zOffset);
-				submodels.add(new WallWasherModel(t, ImmutableList.of(NINE_OCLOCK_KEY)));
-				t.pop();
-				t.push();
-				t.translate(-1.5f, columnHeight, -zOffset);
-				submodels.add(new WallWasherModel(t, ImmutableList.of(THREE_OCLOCK_KEY)));
-				t.pop();
-
-				t.push();
 				t.translate(1.5f, columnHeight, zOffset);
-				submodels.add(new WallWasherModel(t, ImmutableList.of(NINE_OCLOCK_KEY)));
+				submodels.add(new WallWasherModel(t, ImmutableList.of(THREE_OCLOCK_KEY)));
 				t.pop();
 				t.push();
 				t.translate(1.5f, columnHeight, -zOffset);
+				submodels.add(new WallWasherModel(t, ImmutableList.of(NINE_OCLOCK_KEY)));
+				t.pop();
+
+				t.push();
+				t.translate(-1.5f, columnHeight, zOffset);
 				submodels.add(new WallWasherModel(t, ImmutableList.of(THREE_OCLOCK_KEY)));
+				t.pop();
+				t.push();
+				t.translate(-1.5f, columnHeight, -zOffset);
+				submodels.add(new WallWasherModel(t, ImmutableList.of(NINE_OCLOCK_KEY)));
 				t.pop();
 		}
 
