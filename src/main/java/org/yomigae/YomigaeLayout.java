@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.Arrays;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 
 import heronarts.lx.model.LXModel;
 import heronarts.lx.model.LXPoint;
@@ -65,7 +66,7 @@ public class YomigaeLayout {
 			}
 
 			System.out.println("Spotlight start address: " + (lastDmxOffset + 1));
-			for (LXModel m : spotlights) {
+			for (LXModel m : Lists.reverse(spotlights)) {
 				List<LXModel> pointClusters = ModelCollection.filterChildren(m, "point-cluster");
 				int[] indexBuffer = new int[pointClusters.size()];
 				for (int i = 0; i < pointClusters.size(); ++i) {
@@ -84,7 +85,7 @@ public class YomigaeLayout {
 			}
 
 			System.out.println("Wall-washer start address: " + (lastDmxOffset + 1));
-			for (LXModel m : wallWashers) {
+			for (LXModel m : Lists.reverse(wallWashers)) {
 				List<LXModel> pointClusters = ModelCollection.filterChildren(m, "point-cluster");
 				int[] indexBuffer = new int[pointClusters.size()];
 				for (int i = 0; i < pointClusters.size(); ++i) {
