@@ -77,6 +77,13 @@ public class UIConfig extends UICollapsibleSection implements LXParameterListene
     return dp;
   }
 
+  public DiscreteParameter registerDropdownParameter(String label, int value, Object[] options) {
+    DiscreteParameter dp = paramFile.getDiscreteParameter(label, value, 0, options.length);
+    parameters.add(dp);
+    paramLookup.put(label, dp);
+    return dp;
+  }
+
   public StringParameter getStringParameter(String label) {
     return (StringParameter) paramLookup.get(label);
   }

@@ -72,6 +72,7 @@ public class Yomigae extends PApplet {
   public static UIDimmer dimmer;
   public static UIWhiteControl parWhiteControl;
   public static UIWhiteControl wallWasherWhiteControl;
+  public static UINetworkInterface networkInterface;
 
     @Override
   public void settings() {
@@ -146,6 +147,8 @@ public class Yomigae extends PApplet {
 
     lx.ui.setResizable(true);
 
+    networkInterface = (UINetworkInterface) new UINetworkInterface(lx.ui, lx, "NETWORK INTERFACE", "network_interface")
+        .setExpanded(true).addToContainer(lx.ui.leftPane.global);
     dimmer = (UIDimmer) new UIDimmer(lx.ui, "DIMMER", "dimmer")
         .setExpanded(false).addToContainer(lx.ui.leftPane.global);
     parWhiteControl = (UIWhiteControl) new UIWhiteControl(lx.ui, "WHITE : PAR", "white_par")
