@@ -1,15 +1,19 @@
 package org.yomigae;
 
 import java.util.List;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.Set;
 import java.util.Arrays;
+import java.util.Collections;
 
 import com.google.common.collect.ImmutableSet;
 
 import heronarts.lx.model.LXModel;
 import heronarts.lx.model.LXPoint;
 import heronarts.lx.output.LXDatagram;
+import heronarts.lx.output.LXDatagramOutput;
 import heronarts.lx.color.LXColor;
 
 import org.yomigae.model.TempleModel;
@@ -28,6 +32,9 @@ public class YomigaeLayout {
 	private static final int WALL_WASHER_DMX_START_CHANNEL = 101 - 1;
 
 	private final TempleModel model;
+
+	private final List<LXDatagram> mutableDatagrams = new ArrayList<LXDatagram>();
+	public final List<LXDatagram> datagrams = Collections.unmodifiableList(this.mutableDatagrams);
 
 	public YomigaeLayout() {
 		model = new TempleModel();
@@ -103,22 +110,22 @@ public class YomigaeLayout {
 
 			List<DmxFragment> allFragments = new ArrayList<>(spotlightFragments);
 			allFragments.addAll(wallWasherFragments);
-			LXDatagram d = new StreamingACNDatagram(universeNumber, DmxAggregate.fromFragments(allFragments));
 
+			LXDatagram datagram = new StreamingACNDatagram(universeNumber, DmxAggregate.fromFragments(allFragments));
 			int universeHighByte = (0xff00 & universeNumber) >> 8;
 			int universeLowByte = 0xff & universeNumber;
 
 			try {
 				String address = SACN_ADDRESS_BASE + universeHighByte + "." + universeLowByte;
 				System.out.println("Adding DMX datagram for address " + address);
-				d.setAddress(address);
+				datagram.setAddress(address);
 			}
 			catch (Exception e) {
 				System.err.println("Error when setting DMX IP address: " + e.getMessage());
 				e.printStackTrace();
 			}
 
-			model.addDatagram(d);
+			this.mutableDatagrams.add(datagram);
 		}
 	}
 

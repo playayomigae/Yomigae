@@ -1,12 +1,10 @@
 package org.yomigae;
 
-import com.google.common.reflect.ClassPath;
-import heronarts.lx.LXEffect;
-import heronarts.lx.LXPattern;
-import heronarts.lx.studio.LXStudio;
-
 import java.io.IOException;
 import java.lang.reflect.Modifier;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
+import java.net.SocketException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -15,6 +13,14 @@ import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
+
+import com.google.common.reflect.ClassPath;
+
+import heronarts.lx.LXEffect;
+import heronarts.lx.LXPattern;
+import heronarts.lx.output.LXDatagram;
+import heronarts.lx.output.LXDatagramOutput;
+import heronarts.lx.studio.LXStudio;
 import processing.core.PApplet;
 
 public class Yomigae extends PApplet {
@@ -158,7 +164,21 @@ public class Yomigae extends PApplet {
 
     if (enableOutput) {
       // Output.configureE131Output(lx, Output.LightType.PRODPAR);
-      //Output.configureArtnetOutput(lx);
+      // Output.configureArtnetOutput(lx);
+
+      DatagramSocket socket;
+      try {
+        socket = new DatagramSocket(new InetSocketAddress("192.168.1.205", 0));
+        LXDatagramOutput datagramOutput = new LXDatagramOutput(lx, socket);
+        for (LXDatagram datagram : layout.datagrams) {
+          datagramOutput.addDatagram(datagram);
+        }
+        lx.engine.output.addChild(datagramOutput);
+      } catch (SocketException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+
     }
     if (disableOutputOnStart)
       lx.engine.output.enabled.setValue(false);
