@@ -40,14 +40,14 @@ public class YomigaeLayout {
 		String[] universeSpotlightQueries = new String[] {
 			"torii.twelve-oclock spotlight.three-oclock",
 			"torii.six-oclock spotlight.three-oclock",
-			"torii.twelve-oclock spotlight.nine-oclock",
-			"torii.six-oclock spotlight.nine-oclock"
+			"torii.six-oclock spotlight.nine-oclock",
+			"torii.twelve-oclock spotlight.nine-oclock"
 		};
 		String[] universeWallWasherQueries = new String[] {
 			"torii.twelve-oclock wall-washer.three-oclock",
 			"torii.six-oclock wall-washer.three-oclock",
-			"torii.twelve-oclock wall-washer.nine-oclock",
-			"torii.six-oclock wall-washer.nine-oclock"
+			"torii.six-oclock wall-washer.nine-oclock",
+			"torii.twelve-oclock wall-washer.nine-oclock"
 		};
 
 		for (int universeIndex = 0; universeIndex < universeSpotlightQueries.length; ++universeIndex) {
