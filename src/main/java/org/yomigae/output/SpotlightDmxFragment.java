@@ -1,8 +1,10 @@
 package org.yomigae.output;
 
+import java.util.Vector;
+
 import heronarts.lx.color.LXColor;
 
-public class SpotlightDmxFragment extends DmxFragment {
+public class SpotlightDmxFragment extends DmxFragment implements RGBWADmxFragment {
 	public static final int CHANNEL_COUNT = 10;
 
 	/*
@@ -55,10 +57,60 @@ public class SpotlightDmxFragment extends DmxFragment {
 		int index = indexBuffer[0];
 		int c = colors[index];
 
-		buffer[fragmentOffset + CHANNEL_R] = LXColor.red(c);
-		buffer[fragmentOffset + CHANNEL_G] = LXColor.green(c);
-		buffer[fragmentOffset + CHANNEL_B] = LXColor.blue(c);
-		buffer[fragmentOffset + CHANNEL_W] = 0;
-		buffer[fragmentOffset + CHANNEL_A] = 0;
+		byte[] rgbwa = mapRGBtoRGBWA(c);
+
+		// buffer[fragmentOffset + CHANNEL_R] = LXColor.red(c);
+		// buffer[fragmentOffset + CHANNEL_G] = LXColor.green(c);
+		// buffer[fragmentOffset + CHANNEL_B] = LXColor.blue(c);
+		// buffer[fragmentOffset + CHANNEL_W] = 0;
+		// buffer[fragmentOffset + CHANNEL_A] = 0;
+
+		buffer[fragmentOffset + CHANNEL_R] = rgbwa[0];
+		buffer[fragmentOffset + CHANNEL_G] = rgbwa[1];
+		buffer[fragmentOffset + CHANNEL_B] = rgbwa[2];
+		buffer[fragmentOffset + CHANNEL_W] = rgbwa[3];
+		buffer[fragmentOffset + CHANNEL_A] = rgbwa[4];
 	}
+
+	public byte[] mapRGBtoRGBWA(int color) {
+		byte[] ret = new byte[5];
+
+		// map RGB back to K
+
+		// map K into kPoints to get the 2 surrounding indices, i and j
+
+		// linearly interpolate between each RGBWA channel in rgbwaMap[i] and [j]
+
+		return ret;
+	}
+
+	private static int[] kPoints = new int[] {
+		1879,
+		2136,
+		2364,
+		2785,
+		3584,
+		4000,
+		4651,
+		5555,
+		6869,
+		9090,
+		13333,
+		25000
+	};
+
+  private static int[][] rgbwaMap = new int[][] {
+		/* 1879  */ new int[] { 209, 167, 0, 45, 255 },
+		/* 2136  */ new int[] { 245, 207, 0, 118, 255 },
+		/* 2364  */ new int[] { 221, 175, 2, 118, 255 },
+		/* 2785  */ new int[] { 72, 154, 0, 219, 240 },
+		/* 3584  */ new int[] { 90, 177, 14, 211, 255 },
+		/* 4000  */ new int[] { 27, 136, 15, 251, 222 },
+		/* 4651  */ new int[] { 94, 191, 43, 255, 255 },
+		/* 5555  */ new int[] { 97, 214, 79, 255, 237 },
+		/* 6869  */ new int[] { 100, 230, 123, 255, 123 },
+		/* 9090  */ new int[] { 50, 224, 164, 255, 150 },
+		/* 13333 */ new int[] { 0, 229, 239, 255, 150 },
+		/* 25000 */ new int[] { 0, 235, 255, 255, 100 }
+	};
 }

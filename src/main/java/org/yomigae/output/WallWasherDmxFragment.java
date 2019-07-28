@@ -2,7 +2,7 @@ package org.yomigae.output;
 
 import heronarts.lx.color.LXColor;
 
-public class WallWasherDmxFragment extends DmxFragment {
+public class WallWasherDmxFragment extends DmxFragment implements RGBWADmxFragment {
 	public static final int CHANNEL_COUNT = 35;
 
 	/*
