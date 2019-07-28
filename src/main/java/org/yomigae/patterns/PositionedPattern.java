@@ -9,7 +9,7 @@ import heronarts.lx.parameter.EnumParameter;
 public abstract class PositionedPattern extends LXPattern {
 
   public enum Axis {
-    X, Y
+    X, Y, Z
   };
 
   public final EnumParameter<Axis> axis = new EnumParameter<Axis>("Axis", Axis.X)
@@ -37,6 +37,7 @@ public abstract class PositionedPattern extends LXPattern {
     switch (this.axis.getEnum()) {
       case X: return p.xn;
       case Y: return p.yn;
+      case Z: return p.zn;
       // case Z: return p.zn;
       default: return 0;
     }
