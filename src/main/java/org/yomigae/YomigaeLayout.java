@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.Arrays;
 
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Lists;
 
 import heronarts.lx.model.LXModel;
 import heronarts.lx.model.LXPoint;
@@ -39,14 +40,14 @@ public class YomigaeLayout {
 		String[] universeSpotlightQueries = new String[] {
 			"torii.twelve-oclock spotlight.three-oclock",
 			"torii.six-oclock spotlight.three-oclock",
-			"torii.twelve-oclock spotlight.nine-oclock",
-			"torii.six-oclock spotlight.nine-oclock"
+			"torii.six-oclock spotlight.nine-oclock",
+			"torii.twelve-oclock spotlight.nine-oclock"
 		};
 		String[] universeWallWasherQueries = new String[] {
 			"torii.twelve-oclock wall-washer.three-oclock",
 			"torii.six-oclock wall-washer.three-oclock",
-			"torii.twelve-oclock wall-washer.nine-oclock",
-			"torii.six-oclock wall-washer.nine-oclock"
+			"torii.six-oclock wall-washer.nine-oclock",
+			"torii.twelve-oclock wall-washer.nine-oclock"
 		};
 
 		for (int universeIndex = 0; universeIndex < universeSpotlightQueries.length; ++universeIndex) {
@@ -65,7 +66,7 @@ public class YomigaeLayout {
 			}
 
 			System.out.println("Spotlight start address: " + (lastDmxOffset + 1));
-			for (LXModel m : spotlights) {
+			for (LXModel m : Lists.reverse(spotlights)) {
 				List<LXModel> pointClusters = ModelCollection.filterChildren(m, "point-cluster");
 				int[] indexBuffer = new int[pointClusters.size()];
 				for (int i = 0; i < pointClusters.size(); ++i) {
@@ -84,7 +85,7 @@ public class YomigaeLayout {
 			}
 
 			System.out.println("Wall-washer start address: " + (lastDmxOffset + 1));
-			for (LXModel m : wallWashers) {
+			for (LXModel m : Lists.reverse(wallWashers)) {
 				List<LXModel> pointClusters = ModelCollection.filterChildren(m, "point-cluster");
 				int[] indexBuffer = new int[pointClusters.size()];
 				for (int i = 0; i < pointClusters.size(); ++i) {

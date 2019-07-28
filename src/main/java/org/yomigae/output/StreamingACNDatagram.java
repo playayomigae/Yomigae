@@ -38,6 +38,8 @@ public class StreamingACNDatagram extends LXDatagram {
 
   private final static int DEFAULT_UNIVERSE_NUMBER = 1;
 
+  private final static int DATA_PAYLOAD_SIZE = 512;
+
   private final int[] indexBuffer;
   private DmxFragment fragment;
 
@@ -86,7 +88,7 @@ public class StreamingACNDatagram extends LXDatagram {
   }
 
   public StreamingACNDatagram(int universeNumber, DmxFragment fragment) {
-		this(universeNumber, fragment.getNumChannels());
+		this(universeNumber, DATA_PAYLOAD_SIZE);
 
 		this.fragment = fragment;
 	}
