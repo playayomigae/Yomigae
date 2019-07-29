@@ -18,6 +18,8 @@ import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 import processing.core.PApplet;
 
+import org.yomigae.output.BufferSaveOutput;
+
 public class Yomigae extends PApplet {
 
 	static {
@@ -146,6 +148,8 @@ public class Yomigae extends PApplet {
     logger.info("Multithreaded hint: " + MULTITHREADED);
     logger.info("Multithreaded actually: " + (MULTITHREADED && !getGraphics().isGL()));
     lx = new LXStudio(this, flags, layout.getModel());
+
+    lx.addOutput(new BufferSaveOutput(lx));
 
     lx.ui.setResizable(true);
 
