@@ -1,5 +1,6 @@
 package org.yomigae.output;
 
+import org.yomigae.Yomigae;
 import heronarts.lx.color.LXColor;
 
 public class WallWasherDmxFragment extends DmxFragment {
@@ -45,14 +46,8 @@ public class WallWasherDmxFragment extends DmxFragment {
 	@Override
 	public void applyToBuffer(int[] colors, byte[] buffer, int offset) {
 		int fragmentOffset = offset + startChannel;
-		for (int ch = 0; ch < CHANNEL_COUNT; ch++) {
-			// These are probably already 0, but just to be sure.
-			buffer[fragmentOffset + ch] = 0;
-		}
 
-		// Currently set hardware dimmer to full.
-		// We will eventually control this via LX Studio UI controls, one per fixture type.
-		buffer[fragmentOffset + CHANNEL_DIMMER] = (byte)0xff;
+		buffer[fragmentOffset + CHANNEL_DIMMER] = (byte)Yomigae.dimmer.wallWasherDimmer;
 
 		int pixelOffset = 0;
 
@@ -65,8 +60,8 @@ public class WallWasherDmxFragment extends DmxFragment {
 			buffer[pixelOffset + CHANNEL_R] = LXColor.red(c);
 			buffer[pixelOffset + CHANNEL_G] = LXColor.green(c);
 			buffer[pixelOffset + CHANNEL_B] = LXColor.blue(c);
-			buffer[pixelOffset + CHANNEL_W] = 0;
-			buffer[pixelOffset + CHANNEL_A] = 0;
+			buffer[pixelOffset + CHANNEL_W] = (byte)Yomigae.wallWasherWhiteControl.whiteOverride;
+			buffer[pixelOffset + CHANNEL_A] = (byte)Yomigae.wallWasherWhiteControl.amberOverride;
 		}
 	}
 }

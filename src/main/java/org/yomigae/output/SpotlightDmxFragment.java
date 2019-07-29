@@ -1,5 +1,6 @@
 package org.yomigae.output;
 
+import org.yomigae.Yomigae;
 import heronarts.lx.color.LXColor;
 
 public class SpotlightDmxFragment extends DmxFragment {
@@ -43,14 +44,7 @@ public class SpotlightDmxFragment extends DmxFragment {
 	public void applyToBuffer(int[] colors, byte[] buffer, int offset) {
 		int fragmentOffset = offset + startChannel;
 
-		for (int ch = 0; ch < CHANNEL_COUNT; ch++) {
-			// These are probably already 0, but just to be sure.
-			buffer[fragmentOffset + ch] = 0;
-		}
-
-		// Currently set hardware dimmer to full.
-		// We will eventually control this via LX Studio UI controls, one per fixture type.
-		buffer[fragmentOffset + CHANNEL_DIMMER] = (byte)0xff;
+		buffer[fragmentOffset + CHANNEL_DIMMER] = (byte)Yomigae.dimmer.parDimmer;
 
 		int index = indexBuffer[0];
 		int c = colors[index];
@@ -58,7 +52,7 @@ public class SpotlightDmxFragment extends DmxFragment {
 		buffer[fragmentOffset + CHANNEL_R] = LXColor.red(c);
 		buffer[fragmentOffset + CHANNEL_G] = LXColor.green(c);
 		buffer[fragmentOffset + CHANNEL_B] = LXColor.blue(c);
-		buffer[fragmentOffset + CHANNEL_W] = 0;
-		buffer[fragmentOffset + CHANNEL_A] = 0;
+		buffer[fragmentOffset + CHANNEL_W] = (byte)Yomigae.parWhiteControl.whiteOverride;
+		buffer[fragmentOffset + CHANNEL_A] = (byte)Yomigae.parWhiteControl.amberOverride;
 	}
 }

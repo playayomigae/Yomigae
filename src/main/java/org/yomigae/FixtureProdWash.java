@@ -23,8 +23,8 @@ public class FixtureProdWash extends DmxFixture {
    * @return The number of bytes added to the packet.
    */
   protected int postRGBHook(byte[] buffer, int offset) {
-    buffer[offset] = (byte)Yomigae.prodWashWhiteControl.whiteOverride;
-    buffer[offset+1] = (byte)Yomigae.prodWashWhiteControl.amberOverride;
+    buffer[offset] = (byte)Yomigae.wallWasherWhiteControl.whiteOverride;
+    buffer[offset+1] = (byte)Yomigae.wallWasherWhiteControl.amberOverride;
     return 2;
   }
 
