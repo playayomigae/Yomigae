@@ -124,7 +124,8 @@ public class TempleModel extends LXModel {
 	}
 
 	private static void buildHalfTemple(List<LXModel> submodels, int direction, LXTransform t) {
-		t.translate((13 + 11 / 12.f) / 2.f, 0, 0);
+		// translate from temple center (0, 0, 0) to edge of first T6
+		t.translate(direction * (13 + 11 / 12.f) / 2.f, 0, 0);
 
 		String directionTag = direction < 0 ? SIX_OCLOCK_KEY : TWELVE_OCLOCK_KEY;
 		List<String> tunnelKeys = ImmutableList.of(TUNNEL_KEY, directionTag);
@@ -136,7 +137,7 @@ public class TempleModel extends LXModel {
 
 		for (int i = 0; i < 5; ++i) {
 			submodels.add(createTorii(direction, ToriiModel.ToriiType.T1, t, tunnelKeys));
-			t.translate(i < 5 - 1 ? 1 + 11 / 12.f : 0, 0, 0);
+			t.translate(i < 5 - 1 ? direction * (1 + 11 / 12.f) : 0, 0, 0);
 		}
 	}
 

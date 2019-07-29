@@ -108,13 +108,14 @@ public class ToriiModel extends LXModel {
 		List<LXModel> submodels = new ArrayList<>();
 
 		t.push();
+		// translate to center of torii
 		t.translate(columnDepth / 2 * direction, 0, 0);
 
 		float zOffset = 0;
 		switch (toriiType.toIndex()) {
 			case 0: // T1
 				// move 2 meters out from column base
-				zOffset = 6 + 6.75f / 12.f - openingWidth / 2 - columnWidth;
+				zOffset = (6 + 6.75f / 12.f) + openingWidth / 2 + columnWidth;
 
 				t.push();
 				t.translate(0, 0, zOffset);
@@ -128,7 +129,7 @@ public class ToriiModel extends LXModel {
 				break;
 			case 1: // T2
 				// move half a foot from eave end
-				zOffset = 6 / 12.f - beamLength / 2;
+				zOffset = (beamLength / 2) - (6 / 12.f);
 
 				t.push();
 				t.translate(0, columnHeight, zOffset);
@@ -142,7 +143,7 @@ public class ToriiModel extends LXModel {
 				break;
 			default: // T3-T6
 				// move half a foot from eave end
-				zOffset = 6 / 12.f - beamLength / 2;
+				zOffset = (beamLength / 2) - (6 / 12.f);
 
 				t.push();
 				t.translate(1.5f, columnHeight, zOffset);
