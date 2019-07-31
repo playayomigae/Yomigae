@@ -13,7 +13,7 @@ public class WallWasherModel extends LXModel {
 	public static final String MODEL_KEY = "wall-washer";
 
 	// width of "wall washer" fixture, measured from first to last LED center
-	public static final float WIDTH_FEET = 3; // TODO: use actual width
+	public static final float WIDTH_FEET = 3 + 3.5f / 12;
 	private static final float LENS_ANGLE_DEG = 40;
 
 	public WallWasherModel() {

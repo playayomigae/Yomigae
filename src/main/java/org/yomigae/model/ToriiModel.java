@@ -14,7 +14,7 @@ public class ToriiModel extends LXModel {
 	public static final String NINE_OCLOCK_KEY = "nine-oclock";
 	public static final String THREE_OCLOCK_KEY = "three-oclock";
 
-	private static final float WALL_WASHER_GAP = 0.5f;
+	private static final float WALL_WASHER_GAP = 3.f / 12;
 
 	public static enum ToriiType {
 		T1, T2, T3, T4, T5, T6;
