@@ -180,7 +180,7 @@ public class Yomigae extends PApplet {
   }
 
   public void onUIReady(LXStudio lx, LXStudio.UI ui) {
-    // ui.preview.addComponent(new TempleVisualizer(lx));
+    ui.preview.addComponent(new TempleVisualizer(lx));
   }
 
   public void draw() {

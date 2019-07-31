@@ -47,14 +47,6 @@ public class TempleModel extends LXModel {
 	private Set<LXPoint> nineOclockPoints = new HashSet<>();
 	private Set<LXPoint> threeOclockPoints = new HashSet<>();
 
-	private Set<LXPoint> allClusterPoints = new HashSet<>();
-	private Set<LXPoint> hallClusterPoints = new HashSet<>();
-	private Set<LXPoint> tunnelClusterPoints = new HashSet<>();
-	private Set<LXPoint> twelveOclockClusterPoints = new HashSet<>();
-	private Set<LXPoint> sixOclockClusterPoints = new HashSet<>();
-	private Set<LXPoint> nineOclockClusterPoints = new HashSet<>();
-	private Set<LXPoint> threeOclockClusterPoints = new HashSet<>();
-
 	public TempleModel() {
 		this(new LXTransform());
 	}
@@ -66,51 +58,23 @@ public class TempleModel extends LXModel {
 	public TempleModel(LXTransform t, List<String> extraKeys) {
 		super(buildSubmodels(t));
 
-		for (LXModel pointCluster : sub(PointCluster.MODEL_KEY)) {
-			allClusterPoints.add(pointCluster.getPoints().get(0));
-		}
-
 		for (LXModel model : sub(TUNNEL_KEY)) {
 			tunnelPoints.addAll(model.getPoints());
-
-			for (LXModel pointCluster : model.sub(PointCluster.MODEL_KEY)) {
-				tunnelClusterPoints.add(pointCluster.getPoints().get(0));
-			}
 		}
 		for (LXModel model : sub(HALL_KEY)) {
 			hallPoints.addAll(model.getPoints());
-
-			for (LXModel pointCluster : model.sub(PointCluster.MODEL_KEY)) {
-				hallClusterPoints.add(pointCluster.getPoints().get(0));
-			}
 		}
 		for (LXModel model : sub(SIX_OCLOCK_KEY)) {
 			sixOclockPoints.addAll(model.getPoints());
-
-			for (LXModel pointCluster : model.sub(PointCluster.MODEL_KEY)) {
-				sixOclockClusterPoints.add(pointCluster.getPoints().get(0));
-			}
 		}
 		for (LXModel model : sub(TWELVE_OCLOCK_KEY)) {
 			twelveOclockPoints.addAll(model.getPoints());
-
-			for (LXModel pointCluster : model.sub(PointCluster.MODEL_KEY)) {
-				twelveOclockClusterPoints.add(pointCluster.getPoints().get(0));
-			}
 		}
 		for (LXModel model : sub(ToriiModel.THREE_OCLOCK_KEY)) {
 			threeOclockPoints.addAll(model.getPoints());
-
-			for (LXModel pointCluster : model.sub(PointCluster.MODEL_KEY)) {
-				threeOclockClusterPoints.add(pointCluster.getPoints().get(0));
-			}
 		}
 		for (LXModel model : sub(ToriiModel.NINE_OCLOCK_KEY)) {
 			nineOclockPoints.addAll(model.getPoints());
-
-			for (LXModel pointCluster : model.sub(PointCluster.MODEL_KEY)) {
-				nineOclockClusterPoints.add(pointCluster.getPoints().get(0));
-			}
 		}
 
 		String[] keys = new String[extraKeys.size() + 1];
@@ -123,8 +87,13 @@ public class TempleModel extends LXModel {
 		setKeys(keys);
 	}
 
+	public ModelCollection<ToriiModel> getToriis() {
+		return ModelCollection.filterChildren(this, ToriiModel.MODEL_KEY, ToriiModel.class);
+	}
+
 	private static void buildHalfTemple(List<LXModel> submodels, int direction, LXTransform t) {
-		t.translate((13 + 11 / 12.f) / 2.f, 0, 0);
+		t.push();
+		t.translate(direction * ((13 + 11 / 12.f) / 2.f), 0, 0);
 
 		String directionTag = direction < 0 ? SIX_OCLOCK_KEY : TWELVE_OCLOCK_KEY;
 		List<String> tunnelKeys = ImmutableList.of(TUNNEL_KEY, directionTag);
@@ -136,8 +105,10 @@ public class TempleModel extends LXModel {
 
 		for (int i = 0; i < 5; ++i) {
 			submodels.add(createTorii(direction, ToriiModel.ToriiType.T1, t, tunnelKeys));
-			t.translate(i < 5 - 1 ? 1 + 11 / 12.f : 0, 0, 0);
+			t.translate(i < 5 - 1 ? direction * (1 + 11 / 12.f) : 0, 0, 0);
 		}
+
+		t.pop();
 	}
 
 	private static ToriiModel createTorii(int direction, ToriiModel.ToriiType type, LXTransform t, List<String> toriiKeys) {
@@ -148,16 +119,8 @@ public class TempleModel extends LXModel {
 
 	private static LXModel[] buildSubmodels(LXTransform t) {
 		List<LXModel> submodels = new ArrayList<>();
-
-		t.push();
 		buildHalfTemple(submodels, -1, t);
-		t.pop();
-
-		t.push();
 		buildHalfTemple(submodels, 1, t);
-		t.pop();
-
-
 		return submodels.toArray(new LXModel[0]);
 	}
 
@@ -181,31 +144,6 @@ public class TempleModel extends LXModel {
 		}
 		if (!flags.contains(FilterFlags.HALL)) {
 			filteredPoints.removeAll(hallPoints);
-		}
-
-		return filteredPoints;
-	}
-
-	public Set<LXPoint> filterClusterPoints(Set<FilterFlags> flags) {
-		Set<LXPoint> filteredPoints = new HashSet<>(allClusterPoints);
-
-		if (!flags.contains(FilterFlags.TWELVE)) {
-			filteredPoints.removeAll(twelveOclockClusterPoints);
-		}
-		if (!flags.contains(FilterFlags.SIX)) {
-			filteredPoints.removeAll(sixOclockClusterPoints);
-		}
-		if (!flags.contains(FilterFlags.NINE)) {
-			filteredPoints.removeAll(nineOclockClusterPoints);
-		}
-		if (!flags.contains(FilterFlags.THREE)) {
-			filteredPoints.removeAll(threeOclockClusterPoints);
-		}
-		if (!flags.contains(FilterFlags.TUNNEL)) {
-			filteredPoints.removeAll(tunnelClusterPoints);
-		}
-		if (!flags.contains(FilterFlags.HALL)) {
-			filteredPoints.removeAll(hallClusterPoints);
 		}
 
 		return filteredPoints;
