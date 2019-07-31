@@ -2,11 +2,9 @@ package org.yomigae.model;
 
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Set;
 import java.util.Collection;
 import java.util.Arrays;
 
-import com.google.common.reflect.TypeToken;
 import com.google.common.collect.ForwardingList;
 
 import heronarts.lx.model.LXModel;
