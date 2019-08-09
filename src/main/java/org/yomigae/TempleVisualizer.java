@@ -2,13 +2,18 @@ package org.yomigae;
 
 import java.util.List;
 
-// import heronarts.lx.model.LXModel;
+import processing.core.PConstants;
+import processing.core.PGraphics;
+
+import heronarts.lx.LXEngine;
 import heronarts.lx.model.LXPoint;
+import heronarts.lx.color.LXColor;
 import heronarts.p3lx.P3LX;
 import heronarts.p3lx.ui.UI;
 import heronarts.p3lx.ui.UI3dComponent;
-import processing.core.PConstants;
-import processing.core.PGraphics;
+
+import org.yomigae.model.TempleModel;
+import org.yomigae.model.ToriiModel;
 
 public class TempleVisualizer extends UI3dComponent {
   private static final float TOWER_H = 14 * 12;
@@ -62,23 +67,47 @@ public class TempleVisualizer extends UI3dComponent {
     pg.noStroke();
     pg.fill(TOWER_COLOR);
 
-    List<Tori> toris = Tori.CreateGates();
-    List<LXPoint> lights = Tori.createLXPoints(true);
+    List<ToriiModel> toriis = ((TempleModel)lx.getModel()).getToriis();
 
-    int count = 0;
+    LXEngine.Frame frame = new LXEngine.Frame(lx);
+    lx.engine.copyFrameThreadSafe(frame);
+    int[] colors = frame.getColors();
 
-    for (Tori tori : toris) {
+    for (ToriiModel torii : toriis) {
       pg.pushMatrix();
-      // nudging with magic numbers for now until I understand how the torii positions
-      // were calculated
-      pg.translate(tori.gateX + 2, tori.gateY + 4, tori.gateZ - 5);
-      pg.box(2, 10, 1);
-      pg.translate(0, 0, 2);
+      pg.translate(torii.originX + torii.direction * torii.columnDepth / 2, torii.originY, torii.originZ);
 
-      if (count < 6) {
-        pg.pointLight(255, 255, 255, 0, 0, 0);
-        count++;
+      List<LXPoint> points = torii.getNineOclockPoints();
+      int r = 0, g = 0, b = 0;
+      for (LXPoint p : points) {
+        int c = colors[p.index];
+        r += LXColor.red(c) & 0xff;
+        g += LXColor.green(c) & 0xff;
+        b += LXColor.blue(c) & 0xff;
       }
+
+      pg.emissive(r / points.size(), g / points.size(), b / points.size());
+
+      pg.pushMatrix();
+      pg.translate(0, torii.columnHeight / 2, torii.openingWidth / 2);
+      pg.box(torii.columnDepth, torii.columnHeight, torii.columnWidth);
+      pg.popMatrix();
+
+      points = torii.getThreeOclockPoints();
+      r = 0; g = 0; b = 0;
+      for (LXPoint p : points) {
+        int c = colors[p.index];
+        r += LXColor.red(c) & 0xff;
+        g += LXColor.green(c) & 0xff;
+        b += LXColor.blue(c) & 0xff;
+      }
+
+      pg.emissive(r / points.size(), g / points.size(), b / points.size());
+
+      pg.pushMatrix();
+      pg.translate(0, torii.columnHeight / 2, -torii.openingWidth / 2);
+      pg.box(torii.columnDepth, torii.columnHeight, torii.columnWidth);
+      pg.popMatrix();
 
       pg.popMatrix();
     }
