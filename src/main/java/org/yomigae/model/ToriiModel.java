@@ -48,6 +48,9 @@ public class ToriiModel extends LXModel {
 	private static final double[] BEAM_LENGTH_FEET = new double[] {
 			26 + 11.5 / 12., 34 + 2.75 / 12., 41 + 8.75 / 12., 48 + 1.5 / 12., 55 + 11.25 / 12., 60 + 2.5 / 12.
 	};
+	private static final double[] LIGHT_HEIGHT_FEET = new double[] {
+		0, 6., 10 + 6 / 12., 15., 19 + 6 / 12., 24.
+	};
 
 	public final ToriiType toriiType;
 	public final int direction;
@@ -56,6 +59,7 @@ public class ToriiModel extends LXModel {
 	public final float columnWidth, columnHeight, columnDepth;
 	public final float beamHeight, beamLength;
 	public final float eaveDepth; // calculated
+	public final float lightHeight;
 
 	private List<LXPoint> nineOclockPoints = new ArrayList<>();
 	private List<LXPoint> threeOclockPoints = new ArrayList<>();
@@ -75,15 +79,16 @@ public class ToriiModel extends LXModel {
 				(float)COLUMN_HEIGHT_FEET[toriiType.toIndex()],
 				(float)COLUMN_DEPTH_FEET[toriiType.toIndex()],
 				(float)BEAM_HEIGHT_FEET[toriiType.toIndex()],
-				(float)BEAM_LENGTH_FEET[toriiType.toIndex()]);
+				(float)BEAM_LENGTH_FEET[toriiType.toIndex()],
+				(float)LIGHT_HEIGHT_FEET[toriiType.toIndex()]);
 	}
 
 	protected ToriiModel(ToriiType toriiType, int direction, LXTransform t, List<String> extraKeys,
 			float openingWidth, float columnWidth, float columnHeight, float columnDepth,
-			float beamHeight, float beamLength) {
+			float beamHeight, float beamLength, float lightHeight) {
 
 		super(buildSubmodels(toriiType, direction, openingWidth, columnWidth,
-				columnHeight, columnDepth, beamHeight, beamLength, t));
+				columnHeight, columnDepth, beamHeight, beamLength, lightHeight, t));
 
 		this.direction = direction;
 		this.originX = t.x();
@@ -98,6 +103,7 @@ public class ToriiModel extends LXModel {
 		this.beamHeight = beamHeight;
 		this.beamLength = beamLength;
 		this.eaveDepth = (beamLength - 2 * columnWidth - openingWidth) / 2;
+		this.lightHeight = lightHeight;
 
 		String[] keys = new String[extraKeys.size() + 2];
 		keys[0] = MODEL_KEY;
@@ -119,7 +125,7 @@ public class ToriiModel extends LXModel {
 
 	private static LXModel[] buildSubmodels(ToriiType toriiType, int direction,
 			float openingWidth, float columnWidth, float columnHeight, float columnDepth,
-			float beamHeight, float beamLength, LXTransform t) {
+			float beamHeight, float beamLength, float lightHeight, LXTransform t) {
 
 		if (direction != -1 && direction != 1) {
 			throw new RuntimeException("Torii direction must be either -1 or 1.");
@@ -149,37 +155,37 @@ public class ToriiModel extends LXModel {
 				break;
 			case 1: // T2
 				// move half a foot from eave end
-				zOffset = -6 / 12.f + beamLength / 2;
+				zOffset = (openingWidth / 2) + columnWidth;
 
 				t.push();
-				t.translate(0, columnHeight, -zOffset);
+				t.translate(0, lightHeight, -zOffset);
 				submodels.add(new WallWasherModel(t, ImmutableList.of(THREE_OCLOCK_KEY)));
 				t.pop();
 				t.push();
-				t.translate(0, columnHeight, zOffset);
+				t.translate(0, lightHeight, zOffset);
 				submodels.add(new WallWasherModel(t, ImmutableList.of(NINE_OCLOCK_KEY)));
 				t.pop();
 
 				break;
 			default: // T3-T6
 				// move half a foot from eave end
-				zOffset = -6 / 12.f + beamLength / 2;
+				zOffset = (openingWidth / 2) + columnWidth;
 
 				t.push();
-				t.translate(-WALL_WASHER_GAP - WallWasherModel.WIDTH_FEET, columnHeight, -zOffset);
+				t.translate(-WALL_WASHER_GAP - WallWasherModel.WIDTH_FEET, lightHeight, -zOffset);
 				submodels.add(new WallWasherModel(t, ImmutableList.of(THREE_OCLOCK_KEY)));
 				t.pop();
 				t.push();
-				t.translate(-WALL_WASHER_GAP - WallWasherModel.WIDTH_FEET, columnHeight, zOffset);
+				t.translate(-WALL_WASHER_GAP - WallWasherModel.WIDTH_FEET, lightHeight, zOffset);
 				submodels.add(new WallWasherModel(t, ImmutableList.of(NINE_OCLOCK_KEY)));
 				t.pop();
 
 				t.push();
-				t.translate(WALL_WASHER_GAP, columnHeight, -zOffset);
+				t.translate(WALL_WASHER_GAP, lightHeight, -zOffset);
 				submodels.add(new WallWasherModel(t, ImmutableList.of(THREE_OCLOCK_KEY)));
 				t.pop();
 				t.push();
-				t.translate(WALL_WASHER_GAP, columnHeight, zOffset);
+				t.translate(WALL_WASHER_GAP, lightHeight, zOffset);
 				submodels.add(new WallWasherModel(t, ImmutableList.of(NINE_OCLOCK_KEY)));
 				t.pop();
 		}
