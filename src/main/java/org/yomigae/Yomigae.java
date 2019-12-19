@@ -206,7 +206,7 @@ public class Yomigae extends PApplet {
   final static float METER = M;
 
   public static final boolean enableOutput = true;
-  public static final boolean disableOutputOnStart = true;
+  public static final boolean disableOutputOnStart = false;
 
   public static final int LEDS_PER_UNIVERSE = 170;
 }
